@@ -1,0 +1,17 @@
+MyFinanceTracker/
+    /docs
+    /src
+        /backend
+            /FinanceManager.API
+            /FinanceManager.Core
+            /FinanceManager.Infrastructure
+            /FinanceManager.ML
+        /frontend
+            /src
+                /components
+                /pages
+                /services
+                /utils
+            /public
+    /tests
+    docker-compose.yml
