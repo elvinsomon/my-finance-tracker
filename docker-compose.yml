@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16
+    container_name: myfinance-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: financemanager
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d financemanager"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - myfinance-network
+
+  # Seq Logging Server
+  seq:
+    image: datalust/seq:2024
+    container_name: myfinance-seq
+    restart: unless-stopped
+    user: "0:0"  # Run as root to avoid permission issues on macOS
+    environment:
+      ACCEPT_EULA: Y
+    ports:
+      - "5341:80"      # Seq Web UI
+      - "5342:5341"    # Seq ingestion endpoint
+    volumes:
+      - seq_data:/data
+    healthcheck:
+      test: ["CMD", "sh", "-c", "curl -f http://localhost/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - myfinance-network
+
+# Named volumes for data persistence
+volumes:
+  postgres_data:
+    driver: local
+    name: myfinance_postgres_data
+  seq_data:
+    driver: local
+    name: myfinance_seq_data
+
+# Shared network for inter-service communication
+networks:
+  myfinance-network:
+    driver: bridge
+    name: myfinance-network
