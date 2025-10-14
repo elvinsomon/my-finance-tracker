@@ -38,12 +38,55 @@ services:
       - "5342:5341"    # Seq ingestion endpoint
     volumes:
       - seq_data:/data
+    networks:
+      - myfinance-network
+
+  # Backend API (.NET)
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: myfinance-api
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=financemanager;Username=postgres;Password=postgres
+      - Jwt__Secret=MyFinanceTrackerSuperSecretKey32CharactersMinimum!
+      - Jwt__Issuer=FinanceManagerAPI
+      - Jwt__Audience=FinanceManagerClient
+      - Jwt__ExpirationHours=24
+      - Serilog__WriteTo__0__Name=Console
+      - Serilog__WriteTo__1__Name=Seq
+      - Serilog__WriteTo__1__Args__serverUrl=http://seq:5341
+    ports:
+      - "5001:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seq:
+        condition: service_started
+    networks:
+      - myfinance-network
+
+  # Frontend (React)
+  frontend:
+    build:
+      context: ./src/finance-tracker-ui
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://localhost:5001/api
+    container_name: myfinance-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
     healthcheck:
-      test: ["CMD", "sh", "-c", "curl -f http://localhost/ || exit 1"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 30s
+      start_period: 10s
     networks:
       - myfinance-network
 

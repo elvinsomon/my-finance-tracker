@@ -9,7 +9,7 @@ const DateRangePicker = ({ startDate, endDate, onStartDateChange, onEndDateChang
           type="date"
           value={startDate}
           onChange={(e) => onStartDateChange(e.target.value)}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3 border"
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
         />
       </div>
       <div className="flex-1">
@@ -20,7 +20,7 @@ const DateRangePicker = ({ startDate, endDate, onStartDateChange, onEndDateChang
           type="date"
           value={endDate}
           onChange={(e) => onEndDateChange(e.target.value)}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3 border"
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
         />
       </div>
     </div>

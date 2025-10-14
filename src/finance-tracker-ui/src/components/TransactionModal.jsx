@@ -114,7 +114,7 @@ const TransactionModal = ({ transaction, categories, accounts, onClose }) => {
                   value={formData.accountId}
                   onChange={handleChange}
                   required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3 border"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
                 >
                   <option value="">Select account</option>
                   {accounts.map((account) => (
@@ -134,7 +134,7 @@ const TransactionModal = ({ transaction, categories, accounts, onClose }) => {
                   value={formData.categoryId}
                   onChange={handleChange}
                   required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3 border"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
                 >
                   <option value="">Select category</option>
                   {categories.map((category) => (
@@ -154,7 +154,7 @@ const TransactionModal = ({ transaction, categories, accounts, onClose }) => {
                   value={formData.type}
                   onChange={handleChange}
                   required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3 border"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
                 >
                   <option value="Income">Income</option>
                   <option value="Expense">Expense</option>
@@ -173,7 +173,7 @@ const TransactionModal = ({ transaction, categories, accounts, onClose }) => {
                   onChange={handleChange}
                   required
                   max={new Date().toISOString().split('T')[0]}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3 border"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
                 />
               </div>
 
@@ -190,7 +190,7 @@ const TransactionModal = ({ transaction, categories, accounts, onClose }) => {
                   min="0.01"
                   step="0.01"
                   placeholder="0.00"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3 border"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
                 />
               </div>
 
@@ -217,7 +217,7 @@ const TransactionModal = ({ transaction, categories, accounts, onClose }) => {
                 onChange={handleChange}
                 required
                 placeholder="Brief description"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3 border"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
               />
             </div>
 
@@ -232,7 +232,7 @@ const TransactionModal = ({ transaction, categories, accounts, onClose }) => {
                   value={formData.paymentMethod}
                   onChange={handleChange}
                   placeholder="e.g., Credit Card, Cash"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3 border"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
                 />
               </div>
 
@@ -246,7 +246,7 @@ const TransactionModal = ({ transaction, categories, accounts, onClose }) => {
                   value={formData.merchant}
                   onChange={handleChange}
                   placeholder="e.g., Store name"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3 border"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
                 />
               </div>
             </div>
@@ -261,7 +261,7 @@ const TransactionModal = ({ transaction, categories, accounts, onClose }) => {
                 onChange={handleChange}
                 rows="3"
                 placeholder="Additional notes (optional)"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3 border"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
               ></textarea>
             </div>
 
@@ -276,7 +276,7 @@ const TransactionModal = ({ transaction, categories, accounts, onClose }) => {
               <button
                 type="submit"
                 disabled={loading}
-                className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-md text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? <LoadingSpinner size="sm" /> : transaction ? 'Update' : 'Create'}
               </button>

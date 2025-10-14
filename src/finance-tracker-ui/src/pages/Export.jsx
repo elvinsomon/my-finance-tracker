@@ -95,7 +95,7 @@ const Export = () => {
               <select
                 value={filters.type}
                 onChange={(e) => handleFilterChange('type', e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3 border"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
               >
                 <option value="">All Types</option>
                 <option value="Income">Income</option>
@@ -111,7 +111,7 @@ const Export = () => {
               <select
                 value={filters.categoryId}
                 onChange={(e) => handleFilterChange('categoryId', e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3 border"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
               >
                 <option value="">All Categories</option>
                 {categories.map((category) => (
@@ -129,7 +129,7 @@ const Export = () => {
               <select
                 value={filters.accountId}
                 onChange={(e) => handleFilterChange('accountId', e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3 border"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
               >
                 <option value="">All Accounts</option>
                 {accounts.map((account) => (
@@ -153,7 +153,7 @@ const Export = () => {
             <button
               onClick={handleExport}
               disabled={loading}
-              className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-md font-medium flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-medium flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <>

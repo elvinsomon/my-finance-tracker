@@ -79,7 +79,7 @@ const TransactionCard = ({ transaction, onEdit, onDelete }) => {
             {onEdit && (
               <button
                 onClick={() => onEdit(transaction)}
-                className="text-primary-600 hover:text-primary-800 text-sm"
+                className="text-blue-600 hover:text-blue-800 text-sm"
               >
                 Edit
               </button>

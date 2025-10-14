@@ -131,7 +131,7 @@ const Accounts = () => {
         <h1 className="text-3xl font-bold text-gray-900">Accounts</h1>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md font-medium"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium"
         >
           New Account
         </button>
@@ -148,7 +148,7 @@ const Accounts = () => {
           <p className="text-gray-500 mb-4">No accounts yet</p>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="text-primary-600 hover:text-primary-800 font-medium"
+            className="text-blue-600 hover:text-blue-800 font-medium"
           >
             Add your first account
           </button>
@@ -162,7 +162,7 @@ const Accounts = () => {
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center">
-                  <div className="text-primary-600 mr-3">{getAccountIcon(account.type)}</div>
+                  <div className="text-blue-600 mr-3">{getAccountIcon(account.type)}</div>
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900">{account.name}</h3>
                     <p className="text-sm text-gray-500">{account.type}</p>
@@ -242,7 +242,7 @@ const Accounts = () => {
                     onChange={handleChange}
                     required
                     placeholder="e.g., Main Checking Account"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3 border"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
                   />
                 </div>
 
@@ -255,7 +255,7 @@ const Accounts = () => {
                     value={formData.type}
                     onChange={handleChange}
                     required
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3 border"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
                   >
                     <option value="Bank">Bank Account</option>
                     <option value="CreditCard">Credit Card</option>
@@ -287,7 +287,7 @@ const Accounts = () => {
                     required
                     step="0.01"
                     placeholder="0.00"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3 border"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
                   />
                 </div>
 
@@ -301,7 +301,7 @@ const Accounts = () => {
                     value={formData.institution}
                     onChange={handleChange}
                     placeholder="e.g., Bank Name"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3 border"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
                   />
                 </div>
 
@@ -315,7 +315,7 @@ const Accounts = () => {
                     value={formData.accountNumber}
                     onChange={handleChange}
                     placeholder="e.g., ****1234"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3 border"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
                   />
                 </div>
 
@@ -330,7 +330,7 @@ const Accounts = () => {
                   <button
                     type="submit"
                     disabled={formLoading}
-                    className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-md text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {formLoading ? <LoadingSpinner size="sm" /> : 'Create'}
                   </button>

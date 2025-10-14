@@ -26,7 +26,7 @@ const Navbar = () => {
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <Link to="/" className="text-2xl font-bold text-primary-600">
+              <Link to="/" className="text-2xl font-bold text-blue-600">
                 MyFinanceTracker
               </Link>
             </div>
@@ -37,8 +37,8 @@ const Navbar = () => {
                   to={link.path}
                   className={`inline-flex items-center px-3 py-2 text-sm font-medium rounded-md ${
                     isActive(link.path)
-                      ? 'text-primary-700 bg-primary-50'
-                      : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
+                      ? 'text-blue-700 bg-blue-50'
+                      : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
                   }`}
                 >
                   {link.label}
@@ -58,7 +58,7 @@ const Navbar = () => {
           <div className="flex items-center sm:hidden">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-primary-600 hover:bg-gray-100"
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-blue-600 hover:bg-gray-100"
             >
               <svg
                 className="h-6 w-6"
@@ -96,8 +96,8 @@ const Navbar = () => {
                 to={link.path}
                 className={`block px-3 py-2 text-base font-medium ${
                   isActive(link.path)
-                    ? 'text-primary-700 bg-primary-50 border-l-4 border-primary-700'
-                    : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
+                    ? 'text-blue-700 bg-blue-50 border-l-4 border-blue-700'
+                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
                 }`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >

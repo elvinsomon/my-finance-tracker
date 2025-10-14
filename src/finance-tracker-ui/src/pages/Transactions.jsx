@@ -132,7 +132,7 @@ const Transactions = () => {
         <h1 className="text-3xl font-bold text-gray-900">Transactions</h1>
         <button
           onClick={handleNewTransaction}
-          className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md font-medium"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium"
         >
           New Transaction
         </button>
@@ -162,7 +162,7 @@ const Transactions = () => {
             <select
               value={filters.type}
               onChange={(e) => handleFilterChange('type', e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3 border"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
             >
               <option value="">All Types</option>
               <option value="Income">Income</option>
@@ -177,7 +177,7 @@ const Transactions = () => {
             <select
               value={filters.categoryId}
               onChange={(e) => handleFilterChange('categoryId', e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3 border"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
             >
               <option value="">All Categories</option>
               {categories.map((category) => (
@@ -194,7 +194,7 @@ const Transactions = () => {
             <select
               value={filters.accountId}
               onChange={(e) => handleFilterChange('accountId', e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3 border"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
             >
               <option value="">All Accounts</option>
               {accounts.map((account) => (
@@ -224,7 +224,7 @@ const Transactions = () => {
           <p className="text-gray-500 mb-4">No transactions found</p>
           <button
             onClick={handleNewTransaction}
-            className="text-primary-600 hover:text-primary-800 font-medium"
+            className="text-blue-600 hover:text-blue-800 font-medium"
           >
             Add your first transaction
           </button>

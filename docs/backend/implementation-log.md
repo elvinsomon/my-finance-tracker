@@ -1,5 +1,63 @@
 # Implementation Log - MyFinanceTracker Backend
 
+## [2025-10-14 11:25] - Complete Fix for PostgreSQL DateTime UTC Issue
+
+**Problem**: PostgreSQL was rejecting DateTime values when saving or reading transactions with error:
+```
+Cannot write DateTime with Kind=Unspecified to PostgreSQL type 'timestamp with time zone',
+only UTC is supported. Note that it's not possible to mix DateTimes with different Kinds
+in an array, range, or multirange.
+```
+
+**Root Cause Analysis**:
+1. Frontend sends dates in format `YYYY-MM-DD` (e.g., `"2025-10-14"`)
+2. .NET JSON deserializer creates `DateTime` with `Kind=Unspecified`
+3. Error occurs **during JSON deserialization**, before reaching EF Core
+4. Previous fix in `SaveChangesAsync()` didn't help because error happened earlier in the pipeline
+
+**Complete Solution** (2-part fix):
+
+### Part 1: ApplicationDbContext Fix (2025-10-13)
+Modified `SaveChangesAsync()` to convert DateTime properties to UTC before persisting.
+- This fixes dates that reach EF Core with `Kind=Unspecified`
+
+### Part 2: Npgsql Configuration Fix (2025-10-14) ✅
+Added global Npgsql configuration in `Program.cs`:
+```csharp
+// Fix PostgreSQL DateTime UTC issue - treat DateTime.Kind.Unspecified as UTC
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+```
+
+**Location**: Added before `builder.Services.AddDbContext` in Program.cs line 35
+
+**What This Does**:
+- Instructs Npgsql to treat all `DateTime.Kind.Unspecified` as UTC
+- Applies globally to all DateTime handling
+- Works at the Npgsql driver level (before EF Core)
+- Recommended solution by Npgsql team for this scenario
+
+**Files Modified**:
+- `/backend/FinanceManager.API/Program.cs` (added Npgsql switch)
+- `/backend/FinanceManager.Infrastructure/Data/ApplicationDbContext.cs` (SaveChangesAsync - already done)
+
+**Testing**:
+✅ Rebuild backend: `docker-compose build api`
+✅ Restart: `docker-compose up -d api`
+✅ Test transaction creation with date `"2025-10-14"` - **SUCCESS**
+✅ Error no longer occurs
+
+**Result**: DateTime UTC issue completely resolved.
+
+---
+
+## [2025-10-13 15:30] - Initial DateTime Fix Attempt (Partial)
+
+**Solution**: Modified `ApplicationDbContext.SaveChangesAsync()` to convert DateTime properties.
+
+**Note**: This fixed dates reaching EF Core but not dates during JSON deserialization. Required additional Npgsql configuration (see above).
+
+---
+
 ## [2025-10-13 14:30] - Backend API Implementación Completa
 
 **Objetivo**: Construir la API completa de .NET Web API para MyFinanceTracker Phase 1

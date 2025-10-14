@@ -148,9 +148,9 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center">
-            <div className="flex-shrink-0 bg-primary-100 rounded-md p-3">
+            <div className="flex-shrink-0 bg-blue-100 rounded-md p-3">
               <svg
-                className="h-6 w-6 text-primary-600"
+                className="h-6 w-6 text-blue-600"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -248,7 +248,7 @@ const Dashboard = () => {
             <h2 className="text-xl font-semibold">Budget Progress</h2>
             <Link
               to="/budgets"
-              className="text-sm text-primary-600 hover:text-primary-800"
+              className="text-sm text-blue-600 hover:text-blue-800"
             >
               View all
             </Link>
@@ -258,7 +258,7 @@ const Dashboard = () => {
               <p className="text-gray-500 mb-4">No budgets set</p>
               <Link
                 to="/budgets"
-                className="text-primary-600 hover:text-primary-800"
+                className="text-blue-600 hover:text-blue-800"
               >
                 Create your first budget
               </Link>
@@ -284,7 +284,7 @@ const Dashboard = () => {
           <h2 className="text-xl font-semibold">Recent Transactions</h2>
           <Link
             to="/transactions"
-            className="text-sm text-primary-600 hover:text-primary-800"
+            className="text-sm text-blue-600 hover:text-blue-800"
           >
             View all
           </Link>
@@ -294,7 +294,7 @@ const Dashboard = () => {
             <p className="text-gray-500 mb-4">No transactions yet</p>
             <Link
               to="/transactions"
-              className="text-primary-600 hover:text-primary-800"
+              className="text-blue-600 hover:text-blue-800"
             >
               Add your first transaction
             </Link>

@@ -4,6 +4,61 @@ This document tracks all infrastructure setup activities, technical decisions, a
 
 ---
 
+## [2025-10-13 15:45] - Add Backend and Frontend to Docker Compose
+
+### What was done
+- Created `backend/Dockerfile` for .NET API containerization (multi-stage build)
+- Created `backend/.dockerignore` to optimize build context
+- Created `src/finance-tracker-ui/Dockerfile` for React frontend (multi-stage: Node build → Nginx serve)
+- Created `src/finance-tracker-ui/nginx.conf` with gzip, caching, and security headers
+- Created `src/finance-tracker-ui/.dockerignore`
+- Updated `docker-compose.yml` to include `api` and `frontend` services
+- Created comprehensive deployment guide: `docs/infrastructure/docker-deployment.md`
+
+### Technical Decisions
+
+**Backend Dockerfile**:
+- Multi-stage: build → publish → final
+- .NET 9.0 SDK for build, ASP.NET runtime for final (smaller)
+- Layer caching optimization (copy csproj first, then source)
+- Port 80 internal, mapped to 5000 on host
+
+**Frontend Dockerfile**:
+- Multi-stage: Node 20 Alpine build → Nginx Alpine serve
+- Build-time ARG for `VITE_API_URL` (immutable after build)
+- Custom nginx.conf for production optimizations
+- Health check endpoint at `/health`
+
+**Docker Compose**:
+- 4 services: postgres → seq → api → frontend
+- All configs via environment variables (no secrets in image)
+- Shared network: `myfinance-network`
+- Port mappings: Frontend(3000), API(5000), Postgres(5432), Seq(5341)
+
+### Files Created
+- `/backend/Dockerfile`
+- `/backend/.dockerignore`
+- `/src/finance-tracker-ui/Dockerfile`
+- `/src/finance-tracker-ui/nginx.conf`
+- `/src/finance-tracker-ui/.dockerignore`
+- `/docs/infrastructure/docker-deployment.md`
+
+### Files Modified
+- `/docker-compose.yml` (added api and frontend services)
+
+### Usage
+```bash
+# Start entire stack
+docker-compose up -d
+
+# Access services
+# Frontend: http://localhost:3000
+# Backend: http://localhost:5000/swagger
+# Seq: http://localhost:5341
+```
+
+---
+
 ## [2025-10-13 11:30] - Initial Infrastructure Setup
 
 ### What was done

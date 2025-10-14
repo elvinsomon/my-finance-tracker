@@ -96,7 +96,7 @@ const Budgets = () => {
         <h1 className="text-3xl font-bold text-gray-900">Budgets</h1>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md font-medium"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium"
         >
           New Budget
         </button>
@@ -113,7 +113,7 @@ const Budgets = () => {
           <p className="text-gray-500 mb-4">No budgets set</p>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="text-primary-600 hover:text-primary-800 font-medium"
+            className="text-blue-600 hover:text-blue-800 font-medium"
           >
             Create your first budget
           </button>
@@ -182,7 +182,7 @@ const Budgets = () => {
                     value={formData.categoryId}
                     onChange={handleChange}
                     required
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3 border"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
                   >
                     <option value="">Select category</option>
                     {categories.map((category) => (
@@ -202,7 +202,7 @@ const Budgets = () => {
                     value={formData.period}
                     onChange={handleChange}
                     required
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3 border"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
                   >
                     <option value="Monthly">Monthly</option>
                     <option value="Yearly">Yearly</option>
@@ -223,7 +223,7 @@ const Budgets = () => {
                     min="0.01"
                     step="0.01"
                     placeholder="0.00"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3 border"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
                   />
                 </div>
 
@@ -249,7 +249,7 @@ const Budgets = () => {
                       value={formData.startDate}
                       onChange={handleChange}
                       required
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3 border"
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
                     />
                   </div>
                   <div>
@@ -262,7 +262,7 @@ const Budgets = () => {
                       value={formData.endDate}
                       onChange={handleChange}
                       required
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3 border"
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
                     />
                   </div>
                 </div>
@@ -274,7 +274,7 @@ const Budgets = () => {
                       name="alertThreshold80"
                       checked={formData.alertThreshold80}
                       onChange={handleChange}
-                      className="rounded border-gray-300 text-primary-600 focus:ring-primary-500 mr-2"
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2"
                     />
                     <span className="text-sm text-gray-700">Alert at 80% usage</span>
                   </label>
@@ -284,7 +284,7 @@ const Budgets = () => {
                       name="alertThreshold100"
                       checked={formData.alertThreshold100}
                       onChange={handleChange}
-                      className="rounded border-gray-300 text-primary-600 focus:ring-primary-500 mr-2"
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2"
                     />
                     <span className="text-sm text-gray-700">Alert at 100% usage</span>
                   </label>
@@ -301,7 +301,7 @@ const Budgets = () => {
                   <button
                     type="submit"
                     disabled={formLoading}
-                    className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-md text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {formLoading ? <LoadingSpinner size="sm" /> : 'Create'}
                   </button>

@@ -5,6 +5,43 @@ Complete React + Vite frontend implementation for MyFinanceTracker Phase 1 MVP.
 
 ---
 
+## [2025-10-13 15:30] - Fix Primary Button Visibility
+
+**Problem**: Primary buttons (bg-primary-*) were not visible on white backgrounds. The custom Tailwind color palette was not being properly applied, making buttons nearly invisible.
+
+**Root Cause**: While the custom `primary` color was defined in `tailwind.config.js`, Tailwind CSS v4 might not be processing the custom colors correctly during build. The buttons using `bg-primary-600` appeared with no background color.
+
+**Solution**: Replaced all custom `primary-*` color classes with standard Tailwind `blue-*` colors:
+- `bg-primary-600` → `bg-blue-600`
+- `text-primary-600` → `text-blue-600`
+- `hover:bg-primary-700` → `hover:bg-blue-700`
+- `focus:ring-primary-500` → `focus:ring-blue-500`
+- And all other variants
+
+**Files Modified** (14 files):
+- Login.jsx
+- Register.jsx
+- Dashboard.jsx
+- Transactions.jsx
+- TransactionModal.jsx
+- Categories.jsx
+- Budgets.jsx
+- Accounts.jsx
+- Export.jsx
+- Navbar.jsx
+- TransactionCard.jsx
+- CurrencySelector.jsx
+- DateRangePicker.jsx
+- LoadingSpinner.jsx
+
+**Testing**: Build successful. Buttons now have clear blue backgrounds visible on white:
+- Primary buttons: `bg-blue-600 hover:bg-blue-700 text-white`
+- Links: `text-blue-600 hover:text-blue-500`
+
+**Next Steps**: Consider updating tailwind.config.js to use standard colors or troubleshoot custom color issue in Tailwind v4.
+
+---
+
 ## [2025-10-13] - Complete Frontend Implementation
 
 ### What Was Done
