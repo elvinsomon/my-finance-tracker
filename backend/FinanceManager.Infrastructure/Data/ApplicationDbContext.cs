@@ -31,6 +31,28 @@ public class ApplicationDbContext : DbContext
 
         foreach (var entry in entries)
         {
+            // Convert all DateTime properties to UTC
+            foreach (var property in entry.Properties)
+            {
+                if (property.Metadata.ClrType == typeof(DateTime) ||
+                    property.Metadata.ClrType == typeof(DateTime?))
+                {
+                    if (property.CurrentValue is DateTime dateTime)
+                    {
+                        // Convert to UTC if not already
+                        if (dateTime.Kind == DateTimeKind.Unspecified)
+                        {
+                            property.CurrentValue = DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
+                        }
+                        else if (dateTime.Kind == DateTimeKind.Local)
+                        {
+                            property.CurrentValue = dateTime.ToUniversalTime();
+                        }
+                    }
+                }
+            }
+
+            // Set timestamps
             if (entry.State == EntityState.Added)
             {
                 if (entry.Property("CreatedAt") != null)

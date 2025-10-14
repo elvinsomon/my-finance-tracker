@@ -31,6 +31,9 @@ builder.Services.AddControllers();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? "Host=localhost;Port=5432;Database=financemanager;Username=postgres;Password=postgres";
 
+// Fix PostgreSQL DateTime UTC issue - treat DateTime.Kind.Unspecified as UTC
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
