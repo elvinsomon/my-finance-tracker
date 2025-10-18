@@ -9,6 +9,8 @@ import Categories from './pages/Categories';
 import Budgets from './pages/Budgets';
 import Accounts from './pages/Accounts';
 import Export from './pages/Export';
+import SavingsGoals from './pages/SavingsGoals';
+import GoalDetails from './pages/GoalDetails';
 
 function App() {
   return (
@@ -24,6 +26,8 @@ function App() {
             <Route path="/categories" element={<Categories />} />
             <Route path="/budgets" element={<Budgets />} />
             <Route path="/accounts" element={<Accounts />} />
+            <Route path="/savings-goals" element={<SavingsGoals />} />
+            <Route path="/savings-goals/:id" element={<GoalDetails />} />
             <Route path="/export" element={<Export />} />
           </Route>
 

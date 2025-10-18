@@ -9,9 +9,10 @@ using FinanceManager.Infrastructure.Data;
 using FinanceManager.Infrastructure.UnitOfWork;
 using FinanceManager.Infrastructure.Seeders;
 using FinanceManager.Core.Interfaces.Repositories;
-using FinanceManager.Core.Validators;
+using FinanceManager.API.Validators;
 using FinanceManager.API.Services;
 using FinanceManager.API.Middleware;
+using FinanceManager.Core.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,10 +46,14 @@ builder.Services.AddScoped<RegisterUserValidator>();
 builder.Services.AddScoped<LoginValidator>();
 builder.Services.AddScoped<CreateTransactionValidator>();
 builder.Services.AddScoped<UpdateTransactionValidator>();
+builder.Services.AddScoped<CreateSavingsGoalValidator>();
+builder.Services.AddScoped<UpdateSavingsGoalValidator>();
+builder.Services.AddScoped<AddContributionValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 // Services
 builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<SavingsGoalsService>();
 
 // JWT Authentication
 var jwtSecret = builder.Configuration["Jwt:Secret"] ?? "your-super-secret-key-min-32-characters-long-for-security";

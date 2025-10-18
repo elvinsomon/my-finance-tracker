@@ -13,6 +13,7 @@ public class UnitOfWork : IUnitOfWork
     private IBudgetRepository? _budgets;
     private IFinancialAccountRepository? _financialAccounts;
     private IExchangeRateRepository? _exchangeRates;
+    private ISavingsGoalRepository? _savingsGoals;
 
     public UnitOfWork(ApplicationDbContext context)
     {
@@ -36,6 +37,9 @@ public class UnitOfWork : IUnitOfWork
 
     public IExchangeRateRepository ExchangeRates =>
         _exchangeRates ??= new ExchangeRateRepository(_context);
+
+    public ISavingsGoalRepository SavingsGoals =>
+        _savingsGoals ??= new SavingsGoalRepository(_context);
 
     public async Task<int> SaveChangesAsync()
     {

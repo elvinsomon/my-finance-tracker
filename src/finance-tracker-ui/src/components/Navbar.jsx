@@ -13,6 +13,7 @@ const Navbar = () => {
     { path: '/categories', label: 'Categories' },
     { path: '/budgets', label: 'Budgets' },
     { path: '/accounts', label: 'Accounts' },
+    { path: '/savings-goals', label: 'Savings Goals' },
     { path: '/export', label: 'Export' },
   ];
 

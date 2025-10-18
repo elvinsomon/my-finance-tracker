@@ -8,6 +8,7 @@ public interface IUnitOfWork : IDisposable
     IBudgetRepository Budgets { get; }
     IFinancialAccountRepository FinancialAccounts { get; }
     IExchangeRateRepository ExchangeRates { get; }
+    ISavingsGoalRepository SavingsGoals { get; }
 
     Task<int> SaveChangesAsync();
 }

@@ -1,5 +1,220 @@
 # Implementation Log - MyFinanceTracker Backend
 
+## [2025-10-14 14:20] - Implementation of Savings Goals Feature
+
+**Objective**: Implement complete Savings Goals functionality with CRUD operations and contributions tracking.
+
+**What was done**:
+
+### Core Layer Additions:
+
+**Enums Created**:
+- `SavingsGoalStatus` (Active, Completed, Cancelled)
+
+**Entities Created**:
+- `SavingsGoal`: Savings goals with target amount, current amount, priority, status, and emergency fund flag
+- `SavingsContribution`: Individual contributions linking transactions to savings goals
+
+**Repository Interface**:
+- `ISavingsGoalRepository`: Extends IRepository<SavingsGoal> with:
+  - `GetByUserIdAsync(userId, status)`: Get goals by user with optional status filter
+  - `GetByIdWithContributionsAsync(id, userId)`: Get goal with all contributions
+  - `GetContributionsByGoalIdAsync(goalId, userId)`: Get all contributions for a goal
+  - `GetContributionByIdAsync(contributionId, userId)`: Get specific contribution
+  - `AddContributionAsync(contribution)`: Add new contribution
+  - `DeleteContributionAsync(contribution)`: Remove contribution
+
+**Validators** (in Core/Validators):
+- `CreateSavingsGoalRequest` + `CreateSavingsGoalValidator`: Full validation for new goals
+- `UpdateSavingsGoalRequest` + `UpdateSavingsGoalValidator`: Partial updates validation
+- `AddContributionRequest` + `AddContributionValidator`: Contribution validation
+
+**Files created**:
+- `/backend/FinanceManager.Core/Enums/SavingsGoalStatus.cs`
+- `/backend/FinanceManager.Core/Entities/SavingsGoal.cs`
+- `/backend/FinanceManager.Core/Entities/SavingsContribution.cs`
+- `/backend/FinanceManager.Core/Interfaces/Repositories/ISavingsGoalRepository.cs`
+- `/backend/FinanceManager.Core/Validators/SavingsGoalValidators.cs`
+
+### Infrastructure Layer Additions:
+
+**Repository Implementation**:
+- `SavingsGoalRepository`: Full implementation with EF Core queries
+  - Includes navigation properties (SavingsContributions, Transaction)
+  - Orders by Priority and CreatedAt
+  - Filters by status
+
+**EF Core Configurations**:
+- `SavingsGoalConfiguration`: Table schema, indexes, foreign keys
+- `SavingsContributionConfiguration`: Relationships with Cascade/Restrict deletes
+
+**UnitOfWork Update**:
+- Added `ISavingsGoalRepository SavingsGoals` property
+- Lazy initialization pattern maintained
+
+**DbContext Update**:
+- Added `DbSet<SavingsGoal> SavingsGoals`
+- Added `DbSet<SavingsContribution> SavingsContributions`
+
+**Navigation Properties Updated**:
+- `User.SavingsGoals`: ICollection for user's goals
+- `Transaction.SavingsContributions`: ICollection for linked contributions
+
+**Database Migration**:
+- Created migration `20251014122025_AddSavingsGoals`
+- Tables created:
+  - `SavingsGoals` (with indexes on UserId and Status)
+  - `SavingsContributions` (with indexes on GoalId and TransactionId)
+- Foreign keys:
+  - SavingsGoals.UserId → Users.Id (Cascade delete)
+  - SavingsContributions.GoalId → SavingsGoals.Id (Cascade delete)
+  - SavingsContributions.TransactionId → Transactions.Id (Restrict delete)
+
+**Files created**:
+- `/backend/FinanceManager.Infrastructure/Repositories/SavingsGoalRepository.cs`
+- `/backend/FinanceManager.Infrastructure/Data/Configurations/SavingsGoalConfiguration.cs`
+- `/backend/FinanceManager.Infrastructure/Data/Configurations/SavingsContributionConfiguration.cs`
+- `/backend/FinanceManager.Infrastructure/Migrations/20251014122025_AddSavingsGoals.cs`
+
+**Files modified**:
+- `/backend/FinanceManager.Core/Interfaces/Repositories/IUnitOfWork.cs`
+- `/backend/FinanceManager.Infrastructure/UnitOfWork/UnitOfWork.cs`
+- `/backend/FinanceManager.Infrastructure/Data/ApplicationDbContext.cs`
+- `/backend/FinanceManager.Core/Entities/User.cs`
+- `/backend/FinanceManager.Core/Entities/Transaction.cs`
+
+### API Layer Additions:
+
+**Service**:
+- `SavingsGoalsService`: Complete business logic implementation
+  - CRUD operations for goals
+  - Contributions management
+  - Auto-completion when target reached
+  - Automatic status updates (Active ↔ Completed)
+  - Progress and remaining amount calculations
+  - Validation of contribution amounts against transactions
+
+**Controller**:
+- `SavingsGoalsController`: RESTful API with 7 endpoints (all require [Authorize])
+  - `GET /api/savingsgoals`: Get all goals with optional status filter
+  - `GET /api/savingsgoals/{id}`: Get specific goal with details
+  - `POST /api/savingsgoals`: Create new goal
+  - `PUT /api/savingsgoals/{id}`: Update goal (partial updates)
+  - `DELETE /api/savingsgoals/{id}`: Delete goal
+  - `GET /api/savingsgoals/{goalId}/contributions`: Get all contributions
+  - `POST /api/savingsgoals/{goalId}/contributions`: Add contribution
+  - `DELETE /api/savingsgoals/{goalId}/contributions/{contributionId}`: Remove contribution
+
+**DTOs Created**:
+- `SavingsGoalResponse`: Complete goal info with calculated progress and remaining amount
+- `SavingsContributionResponse`: Contribution with transaction basic info
+- `TransactionBasicInfo`: Nested DTO for transaction summary
+
+**Program.cs Configuration**:
+- Registered `SavingsGoalsService` in DI container
+- FluentValidation already configured (auto-discovery)
+
+**Files created**:
+- `/backend/FinanceManager.API/Services/SavingsGoalsService.cs`
+- `/backend/FinanceManager.API/Controllers/SavingsGoalsController.cs`
+- `/backend/FinanceManager.API/DTOs/Responses/SavingsGoalResponse.cs`
+- `/backend/FinanceManager.API/DTOs/Responses/SavingsContributionResponse.cs`
+
+**Files modified**:
+- `/backend/FinanceManager.API/Program.cs`
+
+### Technical Decisions:
+
+**Entity Design**:
+- Priority field (1-10) for goal ordering
+- IsEmergencyFund flag for special handling
+- Icon and Color for UI customization
+- Status enum for lifecycle management (Active/Completed/Cancelled)
+- Separate Date field in contributions (can differ from transaction date)
+
+**Business Logic**:
+- Auto-completion: Goals automatically marked as Completed when CurrentAmount ≥ TargetAmount
+- Auto-reactivation: Completed goals revert to Active if contributions removed and below target
+- Contribution validation: Amount cannot exceed transaction amount
+- CurrentAmount is updated incrementally with each contribution
+- Contributions link to transactions (not mandatory to contribute entire transaction)
+
+**Repository Pattern**:
+- Specialized methods for common queries (GetByUserIdAsync with status filter)
+- Eager loading of navigation properties where needed
+- Separate methods for contribution operations
+
+**API Design**:
+- RESTful nested resources for contributions (/goals/{id}/contributions)
+- UserId extracted from JWT claims (security)
+- Proper HTTP status codes (201 for creates, 204 for deletes)
+- FluentValidation integrated in controller actions
+
+**Database Design**:
+- Cascade delete: User → Goals → Contributions
+- Restrict delete: Transaction ← Contributions (prevents orphaned contributions)
+- Indexes on UserId and Status for efficient queries
+- Decimal(18,2) for all monetary amounts
+
+### Testing Results:
+
+**Build Status**: ✅ SUCCESS
+```bash
+dotnet build
+# Build succeeded.
+# 0 Warning(s)
+# 0 Error(s)
+```
+
+**Migration Status**: ✅ SUCCESS
+```bash
+dotnet ef migrations add AddSavingsGoals
+# Done. To undo this action, use 'ef migrations remove'
+```
+
+### API Endpoints Summary:
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | /api/savingsgoals | List all goals (optional ?status filter) | Required |
+| GET | /api/savingsgoals/{id} | Get goal details | Required |
+| POST | /api/savingsgoals | Create new goal | Required |
+| PUT | /api/savingsgoals/{id} | Update goal | Required |
+| DELETE | /api/savingsgoals/{id} | Delete goal | Required |
+| GET | /api/savingsgoals/{id}/contributions | List contributions | Required |
+| POST | /api/savingsgoals/{id}/contributions | Add contribution | Required |
+| DELETE | /api/savingsgoals/{id}/contributions/{cid} | Remove contribution | Required |
+
+### Validation Rules:
+
+**CreateSavingsGoalRequest**:
+- Name: Required, max 100 characters
+- Description: Optional, max 500 characters
+- TargetAmount: Required, > 0
+- Currency: Required, must be DOP/USD/EUR
+- TargetDate: Required, cannot be in the past
+- Priority: 1-10 range
+
+**UpdateSavingsGoalRequest**:
+- All fields optional (partial updates)
+- Same validation rules when provided
+- Status: Must be Active/Completed/Cancelled
+
+**AddContributionRequest**:
+- TransactionId: Required, must exist and belong to user
+- Amount: Required, > 0, ≤ transaction amount
+- Date: Required, cannot be in the future
+- Notes: Optional, max 500 characters
+
+### Status: ✅ COMPLETED
+
+**Next Steps**:
+1. Apply migration to database
+2. Test endpoints via Swagger
+3. Integrate with frontend
+
+---
+
 ## [2025-10-14 11:25] - Complete Fix for PostgreSQL DateTime UTC Issue
 
 **Problem**: PostgreSQL was rejecting DateTime values when saving or reading transactions with error:

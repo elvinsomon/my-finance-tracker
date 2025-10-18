@@ -28,4 +28,5 @@ public class Transaction
     public User User { get; set; } = null!;
     public FinancialAccount Account { get; set; } = null!;
     public Category Category { get; set; } = null!;
+    public ICollection<SavingsContribution> SavingsContributions { get; set; } = new List<SavingsContribution>();
 }
