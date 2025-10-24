@@ -3,6 +3,7 @@ import transactionService from '../services/transactionService';
 import ErrorAlert from './ErrorAlert';
 import LoadingSpinner from './LoadingSpinner';
 import CurrencySelector from './CurrencySelector';
+import ItemsTable from './transaction/ItemsTable';
 
 const TransactionModal = ({ transaction, categories, accounts, onClose }) => {
   const [formData, setFormData] = useState({
@@ -19,6 +20,8 @@ const TransactionModal = ({ transaction, categories, accounts, onClose }) => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [items, setItems] = useState([]);
+  const [showItems, setShowItems] = useState(false);
 
   useEffect(() => {
     if (transaction) {
@@ -34,6 +37,12 @@ const TransactionModal = ({ transaction, categories, accounts, onClose }) => {
         merchant: transaction.merchant || '',
         notes: transaction.notes || '',
       });
+
+      // Load items if they exist
+      if (transaction.items && transaction.items.length > 0) {
+        setItems(transaction.items);
+        setShowItems(true);
+      }
     }
   }, [transaction]);
 
@@ -44,9 +53,45 @@ const TransactionModal = ({ transaction, categories, accounts, onClose }) => {
     });
   };
 
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: formData.currency || 'USD',
+      minimumFractionDigits: 2,
+    }).format(amount);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+
+    // Validate items total if items are present
+    if (items.length > 0) {
+      const itemsTotal = items.reduce((sum, item) => sum + (item.totalAmount || 0), 0);
+      const transactionAmount = parseFloat(formData.amount);
+
+      if (Math.abs(itemsTotal - transactionAmount) > 0.01) {
+        setError({
+          message: `Items total (${formatCurrency(itemsTotal)}) must equal transaction amount (${formatCurrency(transactionAmount)})`,
+          errors: ['Please adjust item amounts or transaction amount to match.'],
+        });
+        return;
+      }
+
+      // Validate each item
+      const invalidItems = items.filter(
+        (item) => !item.description || item.description.trim() === '' || item.quantity <= 0
+      );
+
+      if (invalidItems.length > 0) {
+        setError({
+          message: 'Invalid items detected',
+          errors: ['All items must have a description and quantity greater than 0.'],
+        });
+        return;
+      }
+    }
+
     setLoading(true);
 
     try {
@@ -54,6 +99,18 @@ const TransactionModal = ({ transaction, categories, accounts, onClose }) => {
         ...formData,
         amount: parseFloat(formData.amount),
       };
+
+      // Include items in payload if present
+      if (items.length > 0) {
+        payload.items = items.map((item) => ({
+          categoryId: item.categoryId || null,
+          description: item.description,
+          quantity: parseFloat(item.quantity),
+          unitPrice: parseFloat(item.unitPrice),
+          totalAmount: parseFloat(item.totalAmount),
+          notes: item.notes || '',
+        }));
+      }
 
       if (transaction) {
         await transactionService.update(transaction.id, payload);
@@ -263,6 +320,59 @@ const TransactionModal = ({ transaction, categories, accounts, onClose }) => {
                 placeholder="Additional notes (optional)"
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
               ></textarea>
+            </div>
+
+            <div className="border-t pt-4">
+              <div className="flex items-center justify-between mb-3">
+                <label className="flex items-center text-sm font-medium text-gray-700 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={showItems}
+                    onChange={(e) => {
+                      setShowItems(e.target.checked);
+                      if (!e.target.checked) {
+                        setItems([]);
+                      }
+                    }}
+                    className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  Add detailed items (optional)
+                </label>
+                {items.length > 0 && (
+                  <span className="text-xs text-gray-500">
+                    {items.length} item{items.length !== 1 ? 's' : ''}
+                  </span>
+                )}
+              </div>
+
+              {showItems && (
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                  <ItemsTable
+                    items={items}
+                    categories={categories}
+                    onItemsChange={setItems}
+                    currency={formData.currency}
+                  />
+                  {items.length > 0 && (
+                    <div className="mt-2 text-sm text-gray-600 flex items-center gap-1">
+                      <svg
+                        className="h-4 w-4 text-blue-500"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      Items total must match transaction amount above
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="flex justify-end gap-3 pt-4">
