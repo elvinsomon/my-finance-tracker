@@ -38,6 +38,12 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
             .IsRequired()
             .HasMaxLength(500);
 
+        builder.Property(t => t.ExternalTransactionId)
+            .HasMaxLength(100);
+
+        builder.Property(t => t.IsImported)
+            .HasDefaultValue(false);
+
         builder.HasOne(t => t.User)
             .WithMany(u => u.Transactions)
             .HasForeignKey(t => t.UserId)
@@ -53,7 +59,14 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
             .HasForeignKey(t => t.CategoryId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.HasOne(t => t.ImportHistory)
+            .WithMany(ih => ih.ImportedTransactions)
+            .HasForeignKey(t => t.ImportHistoryId)
+            .OnDelete(DeleteBehavior.SetNull);
+
         builder.HasIndex(t => t.UserId);
         builder.HasIndex(t => t.Date);
+        builder.HasIndex(t => t.ExternalTransactionId);
+        builder.HasIndex(t => t.ImportHistoryId);
     }
 }

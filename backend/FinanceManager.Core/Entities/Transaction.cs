@@ -24,10 +24,16 @@ public class Transaction
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 
+    // Import-specific fields
+    public int? ImportHistoryId { get; set; }
+    public string? ExternalTransactionId { get; set; }
+    public bool IsImported { get; set; } = false;
+
     // Navigation properties
     public User User { get; set; } = null!;
     public FinancialAccount Account { get; set; } = null!;
     public Category Category { get; set; } = null!;
+    public ImportHistory? ImportHistory { get; set; }
     public ICollection<TransactionItem> Items { get; set; } = new List<TransactionItem>();
     public ICollection<SavingsContribution> SavingsContributions { get; set; } = new List<SavingsContribution>();
 }

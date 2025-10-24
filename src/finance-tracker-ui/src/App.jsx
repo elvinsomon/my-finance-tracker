@@ -12,6 +12,7 @@ import Export from './pages/Export';
 import Reports from './pages/Reports';
 import SavingsGoals from './pages/SavingsGoals';
 import GoalDetails from './pages/GoalDetails';
+import Import from './pages/Import';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
             <Route path="/reports" element={<Reports />} />
             <Route path="/savings-goals" element={<SavingsGoals />} />
             <Route path="/savings-goals/:id" element={<GoalDetails />} />
+            <Route path="/import" element={<Import />} />
             <Route path="/export" element={<Export />} />
           </Route>
 

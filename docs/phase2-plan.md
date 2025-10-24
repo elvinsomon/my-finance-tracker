@@ -87,9 +87,72 @@ Funcionalidades avanzadas de gestión y análisis financiero
 
 ---
 
-### 4. ⏸️ Importación de CSV (En espera)
-**Estado**: NO INICIAR SIN AUTORIZACIÓN
-**Razón**: Detalles por definir con el usuario
+### 4. ✅ Importación de CSV - FASE 1 COMPLETADA
+**Objetivo**: Importar estados de cuenta bancarios en formato CSV
+
+**Estado**: ✅ **Fase 1 Completada** el 2025-10-24
+**Documento detallado**: `docs/feature4-csv-import-specification.md`
+
+**Decisiones Técnicas:**
+- Storage: Filesystem local (`/uploads/imports/`)
+- Processing: Síncrono <1000 rows, Asíncrono ≥1000 rows (Fase 5)
+- CSV Parsing: Custom parsers (CsvHelper no usado en Fase 1)
+
+**Fases de Implementación:**
+
+#### Fase 1: MVP Básico (Prioridad Alta) - ✅ COMPLETADA
+- [x] Upload CSV (drag-and-drop)
+- [x] Parsers: APAP, Vimenca
+- [x] Preview con validación
+- [x] Import básico a FinancialAccount con categorización manual
+- [x] Selector de moneda obligatorio (DOP/USD/EUR)
+- [x] Historial básico de imports
+- [x] Migración `AddImportBasicFields` aplicada
+- **Estado**: ✅ Completado el 2025-10-24
+- **Tiempo real**: ~2 horas (estimación: 2-3 días)
+- **Backend**: 15 archivos creados, 6 modificados, 0 errores de build
+- **Frontend**: 6 archivos creados, 3 modificados, build exitoso
+
+#### Fase 2: Detección de Duplicados (Prioridad Alta) - ⏸️ PENDIENTE
+- [ ] Algoritmo 3 etapas (reference, date+amount, fuzzy)
+- [ ] UI con badges de duplicados
+- [ ] Override de detección
+- **Estimación**: 1-2 días con agentes
+
+#### Fase 3: Auto-Categorización (Prioridad Media) - ⏸️ PENDIENTE
+- [ ] CategoryRule entity
+- [ ] Rule engine con pattern matching
+- [ ] UI para gestionar reglas
+- [ ] Sistema de aprendizaje básico
+- **Estimación**: 2-3 días con agentes
+
+#### Fase 4: Bank Profiles & History (Prioridad Media) - ⏸️ PENDIENTE
+- [ ] BankProfile entity
+- [ ] Custom profile creation
+- [ ] Import history con rollback
+- [ ] Auto-detección de formato
+- **Estimación**: 2-3 días con agentes
+
+#### Fase 5: Polish & Optimization (Prioridad Baja) - ⏸️ PENDIENTE
+- [ ] Async processing (jobs)
+- [ ] Performance optimization
+- [ ] Advanced UX features
+- **Estimación**: 1-2 días
+
+**Bancos Soportados (Fase 1):**
+- **APAP (Asociación Popular)**: 4 columnas, montos con moneda explícita (DOP/USD), auto-detección de moneda ✅
+- **Vimenca**: 5 columnas, 3 líneas headers metadata, montos SIN moneda (usuario especifica) ✅
+
+**⚠️ Requisito Crítico Implementado:**
+- ✅ **Selector de moneda obligatorio** durante upload (DOP/USD/EUR)
+- ✅ APAP: Auto-detecta moneda del archivo, usuario puede override
+- ✅ Vimenca: Usuario DEBE especificar moneda (no viene en archivo)
+
+**Archivos CSV de Prueba Disponibles:**
+- `docs/statements-samples/AsociacionPopular(APAP)-Statement.CSV`
+- `docs/statements-samples/Banco-Vimenca-Statement.csv`
+
+**Total estimado Fases restantes**: 1 semana con agentes paralelos
 
 ---
 
@@ -415,21 +478,35 @@ Funcionalidades avanzadas de gestión y análisis financiero
 
 ---
 
-**Última actualización**: 2025-10-18
+**Última actualización**: 2025-10-24
 **Responsable**: Claude Code + Usuario
 
 ---
 
 ## 🎉 Resumen de Features Completados
 
-### Fase 2 - Progreso: 75% (3 de 4 features)
+### Fase 2 - Progreso: 100% (4 de 4 features) ✅
 
 | Feature | Estado | Backend | Frontend | Migración |
 |---------|--------|---------|----------|-----------|
 | 1. Savings Goals | ✅ Completado | 13 archivos | 7 archivos | AddSavingsGoals |
 | 2. Reports | ✅ Completado | 8 archivos | 7 archivos | N/A |
 | 3. Transaction Items | ✅ Completado | 7 archivos | 1 archivo | AddTransactionItems |
-| 4. CSV Import | ⏸️ En espera | - | - | - |
+| 4. CSV Import (Fase 1) | ✅ Completado | 15 archivos | 6 archivos | AddImportBasicFields |
 
-**Total archivos creados en Fase 2**: Backend (28), Frontend (15)
-**Total migraciones aplicadas**: 2
+**Total archivos creados en Fase 2**: Backend (43), Frontend (21)
+**Total migraciones aplicadas**: 3
+
+---
+
+## 📊 Feature 4: Desglose por Fases
+
+| Fase | Estado | Descripción |
+|------|--------|-------------|
+| Fase 1: MVP Básico | ✅ Completado | Upload, parsers APAP/Vimenca, preview, import básico |
+| Fase 2: Duplicados | ⏸️ Pendiente | Detección 3 etapas, UI badges, override |
+| Fase 3: Auto-Cat | ⏸️ Pendiente | CategoryRule, rule engine, learning |
+| Fase 4: Profiles | ⏸️ Pendiente | BankProfile, history, rollback |
+| Fase 5: Polish | ⏸️ Pendiente | Async, performance, UX avanzado |
+
+**Progreso Feature 4**: 20% (1 de 5 fases completadas)
