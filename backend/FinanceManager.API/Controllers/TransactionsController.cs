@@ -99,7 +99,7 @@ public class TransactionsController : ControllerBase
     public async Task<ActionResult<TransactionResponse>> GetTransaction(Guid id)
     {
         var userId = GetUserId();
-        var transaction = await _unitOfWork.Transactions.GetByIdAsync(id);
+        var transaction = await _unitOfWork.Transactions.GetByIdWithItemsAsync(id);
 
         if (transaction == null || transaction.UserId != userId)
             throw new NotFoundException("Transaction not found");
@@ -124,7 +124,20 @@ public class TransactionsController : ControllerBase
             Notes = transaction.Notes,
             AttachmentUrl = transaction.AttachmentUrl,
             CreatedAt = transaction.CreatedAt,
-            UpdatedAt = transaction.UpdatedAt
+            UpdatedAt = transaction.UpdatedAt,
+            Items = transaction.Items.Select(i => new TransactionItemResponse
+            {
+                Id = i.Id,
+                TransactionId = i.TransactionId,
+                CategoryId = i.CategoryId,
+                CategoryName = i.Category.Name,
+                Description = i.Description,
+                Quantity = i.Quantity,
+                UnitPrice = i.UnitPrice,
+                TotalAmount = i.TotalAmount,
+                Notes = i.Notes,
+                CreatedAt = i.CreatedAt
+            }).ToList()
         };
 
         return Ok(response);
@@ -151,6 +164,40 @@ public class TransactionsController : ControllerBase
         if (category == null)
             throw new NotFoundException("Category not found");
 
+        // Validate items if present
+        if (request.Items != null && request.Items.Any())
+        {
+            // Validate items sum equals transaction amount
+            var itemsTotal = request.Items.Sum(i => i.TotalAmount);
+            if (Math.Abs(itemsTotal - request.Amount) > 0.01m)
+            {
+                throw new ValidationException(new List<string>
+                {
+                    $"Sum of items ({itemsTotal}) must equal transaction amount ({request.Amount})"
+                });
+            }
+
+            // Validate each item
+            foreach (var item in request.Items)
+            {
+                if (item.CategoryId.HasValue)
+                {
+                    var itemCategory = await _unitOfWork.Categories.GetByIdAsync(item.CategoryId.Value);
+                    if (itemCategory == null)
+                        throw new NotFoundException($"Category not found for item: {item.Description}");
+                }
+
+                // Validate TotalAmount = Quantity × UnitPrice
+                if (Math.Abs(item.TotalAmount - (item.Quantity * item.UnitPrice)) > 0.01m)
+                {
+                    throw new ValidationException(new List<string>
+                    {
+                        $"Item '{item.Description}': TotalAmount must equal Quantity × UnitPrice"
+                    });
+                }
+            }
+        }
+
         var transaction = new Transaction
         {
             Id = Guid.NewGuid(),
@@ -172,11 +219,32 @@ public class TransactionsController : ControllerBase
             UpdatedAt = DateTime.UtcNow
         };
 
+        // Add items if present
+        if (request.Items != null && request.Items.Any())
+        {
+            foreach (var itemRequest in request.Items)
+            {
+                var item = new TransactionItem
+                {
+                    Id = Guid.NewGuid(),
+                    TransactionId = transaction.Id,
+                    CategoryId = itemRequest.CategoryId ?? request.CategoryId,
+                    Description = itemRequest.Description,
+                    Quantity = itemRequest.Quantity,
+                    UnitPrice = itemRequest.UnitPrice,
+                    TotalAmount = itemRequest.TotalAmount,
+                    Notes = itemRequest.Notes,
+                    CreatedAt = DateTime.UtcNow
+                };
+                transaction.Items.Add(item);
+            }
+        }
+
         await _unitOfWork.Transactions.AddAsync(transaction);
         await _unitOfWork.SaveChangesAsync();
 
         // Reload to get navigation properties
-        transaction = await _unitOfWork.Transactions.GetByIdAsync(transaction.Id);
+        transaction = await _unitOfWork.Transactions.GetByIdWithItemsAsync(transaction.Id);
 
         var response = new TransactionResponse
         {
@@ -196,7 +264,20 @@ public class TransactionsController : ControllerBase
             Merchant = transaction.Merchant,
             Status = transaction.Status.ToString(),
             Notes = transaction.Notes,
-            CreatedAt = transaction.CreatedAt
+            CreatedAt = transaction.CreatedAt,
+            Items = transaction.Items.Select(i => new TransactionItemResponse
+            {
+                Id = i.Id,
+                TransactionId = i.TransactionId,
+                CategoryId = i.CategoryId,
+                CategoryName = i.Category.Name,
+                Description = i.Description,
+                Quantity = i.Quantity,
+                UnitPrice = i.UnitPrice,
+                TotalAmount = i.TotalAmount,
+                Notes = i.Notes,
+                CreatedAt = i.CreatedAt
+            }).ToList()
         };
 
         return StatusCode(201, response);
@@ -212,7 +293,7 @@ public class TransactionsController : ControllerBase
         }
 
         var userId = GetUserId();
-        var transaction = await _unitOfWork.Transactions.GetByIdAsync(id);
+        var transaction = await _unitOfWork.Transactions.GetByIdWithItemsAsync(id);
 
         if (transaction == null || transaction.UserId != userId)
             throw new NotFoundException("Transaction not found");
@@ -252,11 +333,76 @@ public class TransactionsController : ControllerBase
         if (request.Notes != null)
             transaction.Notes = request.Notes;
 
+        // Handle items update
+        if (request.Items != null)
+        {
+            // Validate items sum equals transaction amount
+            if (request.Items.Any())
+            {
+                var itemsTotal = request.Items.Sum(i => i.TotalAmount);
+                var amountToValidate = request.Amount ?? transaction.Amount;
+
+                if (Math.Abs(itemsTotal - amountToValidate) > 0.01m)
+                {
+                    throw new ValidationException(new List<string>
+                    {
+                        $"Sum of items ({itemsTotal}) must equal transaction amount ({amountToValidate})"
+                    });
+                }
+
+                // Validate each item
+                foreach (var item in request.Items)
+                {
+                    if (item.CategoryId.HasValue)
+                    {
+                        var itemCategory = await _unitOfWork.Categories.GetByIdAsync(item.CategoryId.Value);
+                        if (itemCategory == null)
+                            throw new NotFoundException($"Category not found for item: {item.Description}");
+                    }
+
+                    // Validate TotalAmount = Quantity × UnitPrice
+                    if (Math.Abs(item.TotalAmount - (item.Quantity * item.UnitPrice)) > 0.01m)
+                    {
+                        throw new ValidationException(new List<string>
+                        {
+                            $"Item '{item.Description}': TotalAmount must equal Quantity × UnitPrice"
+                        });
+                    }
+                }
+
+                // Remove existing items
+                transaction.Items.Clear();
+
+                // Add new items
+                foreach (var itemRequest in request.Items)
+                {
+                    var item = new TransactionItem
+                    {
+                        Id = Guid.NewGuid(),
+                        TransactionId = transaction.Id,
+                        CategoryId = itemRequest.CategoryId ?? (request.CategoryId ?? transaction.CategoryId),
+                        Description = itemRequest.Description,
+                        Quantity = itemRequest.Quantity,
+                        UnitPrice = itemRequest.UnitPrice,
+                        TotalAmount = itemRequest.TotalAmount,
+                        Notes = itemRequest.Notes,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    transaction.Items.Add(item);
+                }
+            }
+            else
+            {
+                // Empty items list means remove all items
+                transaction.Items.Clear();
+            }
+        }
+
         await _unitOfWork.Transactions.UpdateAsync(transaction);
         await _unitOfWork.SaveChangesAsync();
 
         // Reload to get navigation properties
-        transaction = await _unitOfWork.Transactions.GetByIdAsync(id);
+        transaction = await _unitOfWork.Transactions.GetByIdWithItemsAsync(id);
 
         var response = new TransactionResponse
         {
@@ -277,7 +423,20 @@ public class TransactionsController : ControllerBase
             Status = transaction.Status.ToString(),
             Notes = transaction.Notes,
             UpdatedAt = transaction.UpdatedAt,
-            CreatedAt = transaction.CreatedAt
+            CreatedAt = transaction.CreatedAt,
+            Items = transaction.Items.Select(i => new TransactionItemResponse
+            {
+                Id = i.Id,
+                TransactionId = i.TransactionId,
+                CategoryId = i.CategoryId,
+                CategoryName = i.Category.Name,
+                Description = i.Description,
+                Quantity = i.Quantity,
+                UnitPrice = i.UnitPrice,
+                TotalAmount = i.TotalAmount,
+                Notes = i.Notes,
+                CreatedAt = i.CreatedAt
+            }).ToList()
         };
 
         return Ok(response);

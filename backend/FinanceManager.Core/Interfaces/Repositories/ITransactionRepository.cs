@@ -17,4 +17,5 @@ public interface ITransactionRepository : IRepository<Transaction>
 
     Task<IEnumerable<Transaction>> GetByUserIdAsync(Guid userId);
     Task<IEnumerable<Transaction>> GetByCategoryAndDateRangeAsync(Guid categoryId, DateTime startDate, DateTime endDate);
+    Task<Transaction?> GetByIdWithItemsAsync(Guid id);
 }

@@ -54,6 +54,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 // Services
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<SavingsGoalsService>();
+builder.Services.AddScoped<ReportsService>();
 
 // JWT Authentication
 var jwtSecret = builder.Configuration["Jwt:Secret"] ?? "your-super-secret-key-min-32-characters-long-for-security";

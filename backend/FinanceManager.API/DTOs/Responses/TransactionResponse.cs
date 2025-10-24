@@ -21,4 +21,5 @@ public class TransactionResponse
     public string? AttachmentUrl { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
+    public List<TransactionItemResponse> Items { get; set; } = new List<TransactionItemResponse>();
 }

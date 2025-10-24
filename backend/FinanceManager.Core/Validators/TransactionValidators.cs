@@ -15,6 +15,17 @@ public class CreateTransactionRequest
     public string? PaymentMethod { get; set; }
     public string? Merchant { get; set; }
     public string? Notes { get; set; }
+    public List<TransactionItemRequest>? Items { get; set; }
+}
+
+public class TransactionItemRequest
+{
+    public Guid? CategoryId { get; set; }
+    public string Description { get; set; } = string.Empty;
+    public decimal Quantity { get; set; }
+    public decimal UnitPrice { get; set; }
+    public decimal TotalAmount { get; set; }
+    public string? Notes { get; set; }
 }
 
 public class CreateTransactionValidator : AbstractValidator<CreateTransactionRequest>
@@ -60,6 +71,7 @@ public class UpdateTransactionRequest
     public string? PaymentMethod { get; set; }
     public string? Merchant { get; set; }
     public string? Notes { get; set; }
+    public List<TransactionItemRequest>? Items { get; set; }
 }
 
 public class UpdateTransactionValidator : AbstractValidator<UpdateTransactionRequest>

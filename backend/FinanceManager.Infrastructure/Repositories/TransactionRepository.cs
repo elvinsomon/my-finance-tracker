@@ -78,4 +78,14 @@ public class TransactionRepository : GenericRepository<Transaction>, ITransactio
             .Include(t => t.Category)
             .FirstOrDefaultAsync(t => t.Id == id);
     }
+
+    public async Task<Transaction?> GetByIdWithItemsAsync(Guid id)
+    {
+        return await _dbSet
+            .Include(t => t.Account)
+            .Include(t => t.Category)
+            .Include(t => t.Items)
+                .ThenInclude(i => i.Category)
+            .FirstOrDefaultAsync(t => t.Id == id);
+    }
 }
