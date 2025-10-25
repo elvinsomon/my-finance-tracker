@@ -112,6 +112,51 @@ const ImportSummary = ({ summary, onConfirm, onCancel, loading }) => {
           </div>
         )}
 
+        {/* Duplicate Detection Info */}
+        {(summary.duplicatesSkipped > 0 || summary.duplicatesOverridden > 0) && (
+          <div className="border-t border-gray-200 pt-6 mt-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">
+              Duplicate Detection
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {summary.duplicatesSkipped > 0 && (
+                <div className="flex items-center space-x-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                  <div className="flex-shrink-0">
+                    <svg className="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-yellow-900">
+                      {summary.duplicatesSkipped} Duplicate{summary.duplicatesSkipped !== 1 ? 's' : ''} Skipped
+                    </div>
+                    <div className="text-xs text-yellow-700">
+                      Will not be imported
+                    </div>
+                  </div>
+                </div>
+              )}
+              {summary.duplicatesOverridden > 0 && (
+                <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="flex-shrink-0">
+                    <svg className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-blue-900">
+                      {summary.duplicatesOverridden} Override{summary.duplicatesOverridden !== 1 ? 's' : ''}
+                    </div>
+                    <div className="text-xs text-blue-700">
+                      Will be imported anyway
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Bank Profile Info */}
         {summary.bankProfileName && (
           <div className="border-t border-gray-200 pt-6 mt-6">

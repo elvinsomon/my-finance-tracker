@@ -56,6 +56,8 @@ builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<SavingsGoalsService>();
 builder.Services.AddScoped<ReportsService>();
 builder.Services.AddScoped<ImportService>();
+builder.Services.AddScoped<DuplicateDetectionService>();
+builder.Services.AddScoped<CategoryRuleEngine>();
 
 // Memory Cache for import sessions
 builder.Services.AddMemoryCache();

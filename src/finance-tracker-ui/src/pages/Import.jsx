@@ -29,6 +29,7 @@ const Import = () => {
   const [previewData, setPreviewData] = useState(null);
   const [categories, setCategories] = useState([]);
   const [transactions, setTransactions] = useState([]);
+  const [duplicateOverrides, setDuplicateOverrides] = useState(new Map());
 
   // Step 3: Summary
   const [importSummary, setImportSummary] = useState(null);
@@ -85,12 +86,18 @@ const Import = () => {
         amount: item.amount,
         currency: item.currency,
         externalReference: item.externalReference,
-        suggestedCategoryId: null,
+        suggestedCategoryId: item.suggestedCategoryId || null,
+        categorySuggestion: item.categorySuggestion || null,
+        duplicateStatus: item.duplicateStatus !== undefined ? item.duplicateStatus : 0,
+        duplicateReason: item.duplicateReason || null,
+        duplicateTransactionId: item.duplicateTransactionId || null,
+        overrideDuplicate: false,
         isValid: item.isValid,
         validationErrors: item.validationErrors || []
       }));
 
       setTransactions(transformedTransactions);
+      setDuplicateOverrides(new Map());
       setCurrentStep(2);
     } catch (err) {
       setError(err);
@@ -110,8 +117,37 @@ const Import = () => {
     );
   };
 
+  // Step 2: Handle duplicate override change
+  const handleOverrideChange = (rowNumber, override) => {
+    setDuplicateOverrides((prev) => {
+      const newMap = new Map(prev);
+      if (override) {
+        newMap.set(rowNumber, true);
+      } else {
+        newMap.delete(rowNumber);
+      }
+      return newMap;
+    });
+
+    // Update transaction state to reflect override
+    setTransactions((prevTransactions) =>
+      prevTransactions.map((transaction) =>
+        transaction.rowNumber === rowNumber
+          ? { ...transaction, overrideDuplicate: override }
+          : transaction
+      )
+    );
+  };
+
   // Step 2: Proceed to summary
   const handleProceedToSummary = () => {
+    // Duplicate status enums
+    const DuplicateStatus = {
+      New: 0,
+      LikelyDuplicate: 1,
+      ConfirmedDuplicate: 2
+    };
+
     // Check if all valid transactions have categories
     const validTransactions = transactions.filter(t => t.isValid);
     const missingCategories = validTransactions.filter(
@@ -126,15 +162,30 @@ const Import = () => {
       return;
     }
 
+    // Calculate duplicate counts
+    const newCount = transactions.filter(t => t.duplicateStatus === DuplicateStatus.New).length;
+    const confirmedDuplicates = transactions.filter(t => t.duplicateStatus === DuplicateStatus.ConfirmedDuplicate).length;
+    const likelyDuplicates = transactions.filter(t => t.duplicateStatus === DuplicateStatus.LikelyDuplicate).length;
+    const overriddenCount = Array.from(duplicateOverrides.values()).filter(v => v).length;
+    const willImport = newCount + overriddenCount;
+    const willSkip = confirmedDuplicates + likelyDuplicates - overriddenCount;
+
     // Calculate summary
     const selectedAccount = accounts.find(a => a.id === selectedAccountId);
-    const totalAmount = transactions
-      .filter(t => t.isValid)
-      .reduce((sum, t) => sum + t.amount, 0);
+
+    // Only include transactions that will actually be imported
+    const transactionsToImport = transactions.filter(t =>
+      t.isValid && (
+        t.duplicateStatus === DuplicateStatus.New ||
+        t.overrideDuplicate
+      )
+    );
+
+    const totalAmount = transactionsToImport.reduce((sum, t) => sum + t.amount, 0);
 
     // Group by category
-    const categoryGroups = transactions
-      .filter(t => t.isValid && t.suggestedCategoryId)
+    const categoryGroups = transactionsToImport
+      .filter(t => t.suggestedCategoryId)
       .reduce((groups, t) => {
         const categoryId = t.suggestedCategoryId;
         if (!groups[categoryId]) {
@@ -151,13 +202,15 @@ const Import = () => {
     const categoriesBreakdown = Object.values(categoryGroups);
 
     setImportSummary({
-      totalTransactions: validTransactions.length,
+      totalTransactions: transactionsToImport.length,
       accountName: selectedAccount?.name || 'Unknown',
       currency: selectedCurrency,
       totalAmount,
       categoriesBreakdown,
       bankProfileName: previewData?.detectedBank,
-      detectionConfidence: previewData?.confidence
+      detectionConfidence: previewData?.confidence,
+      duplicatesSkipped: willSkip,
+      duplicatesOverridden: overriddenCount
     });
 
     setCurrentStep(3);
@@ -177,9 +230,15 @@ const Import = () => {
           return dict;
         }, {});
 
+      // Prepare duplicate overrides as array of row numbers
+      const duplicateOverridesArray = Array.from(duplicateOverrides.entries())
+        .filter(([_, override]) => override)
+        .map(([rowNumber, _]) => rowNumber);
+
       const response = await importService.confirmImport(
         uploadId,
-        categoryAssignments
+        categoryAssignments,
+        duplicateOverridesArray
       );
 
       // Show success and redirect to transactions
@@ -374,6 +433,7 @@ const Import = () => {
             transactions={transactions}
             categories={categories}
             onCategoryChange={handleCategoryChange}
+            onOverrideChange={handleOverrideChange}
           />
 
           <div className="flex justify-between pt-6">

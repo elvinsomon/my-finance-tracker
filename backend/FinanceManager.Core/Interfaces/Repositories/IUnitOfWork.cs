@@ -10,6 +10,7 @@ public interface IUnitOfWork : IDisposable
     IExchangeRateRepository ExchangeRates { get; }
     ISavingsGoalRepository SavingsGoals { get; }
     IImportHistoryRepository ImportHistories { get; }
+    ICategoryRuleRepository CategoryRules { get; }
 
     Task<int> SaveChangesAsync();
 }

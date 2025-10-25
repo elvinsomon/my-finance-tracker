@@ -13,6 +13,7 @@ import Reports from './pages/Reports';
 import SavingsGoals from './pages/SavingsGoals';
 import GoalDetails from './pages/GoalDetails';
 import Import from './pages/Import';
+import CategoryRules from './pages/CategoryRules';
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
             <Route path="/savings-goals" element={<SavingsGoals />} />
             <Route path="/savings-goals/:id" element={<GoalDetails />} />
             <Route path="/import" element={<Import />} />
+            <Route path="/category-rules" element={<CategoryRules />} />
             <Route path="/export" element={<Export />} />
           </Route>
 

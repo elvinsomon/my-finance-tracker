@@ -21,10 +21,11 @@ const importService = {
   },
 
   // Confirm and execute import
-  confirmImport: async (uploadId, categoryAssignments) => {
+  confirmImport: async (uploadId, categoryAssignments, duplicateOverrides = []) => {
     const response = await api.post(`/imports/${uploadId}/confirm`, {
       uploadId,
-      categoryAssignments
+      categoryAssignments,
+      duplicateOverrides
     });
     return response.data;
   },

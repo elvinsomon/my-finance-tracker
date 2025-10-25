@@ -29,6 +29,10 @@ public class Transaction
     public string? ExternalTransactionId { get; set; }
     public bool IsImported { get; set; } = false;
 
+    // Auto-categorization fields (Phase 3)
+    public Guid? SuggestedCategoryId { get; set; }
+    public decimal? CategoryConfidenceScore { get; set; }  // 0.00 - 1.00
+
     // Navigation properties
     public User User { get; set; } = null!;
     public FinancialAccount Account { get; set; } = null!;

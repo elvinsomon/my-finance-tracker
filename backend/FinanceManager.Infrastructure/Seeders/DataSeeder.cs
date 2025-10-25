@@ -10,9 +10,19 @@ public static class DataSeeder
     public static async Task SeedAsync(ApplicationDbContext context)
     {
         // Check if categories already exist
-        if (await context.Categories.AnyAsync(c => c.IsSystem))
-            return;
+        var categoriesExist = await context.Categories.AnyAsync(c => c.IsSystem);
 
+        if (!categoriesExist)
+        {
+            await SeedCategoriesAsync(context);
+        }
+
+        // Seed category rules if not already seeded
+        await SeedCategoryRulesForSystemUserAsync(context);
+    }
+
+    private static async Task SeedCategoriesAsync(ApplicationDbContext context)
+    {
         var categories = new List<Category>
         {
             // Income categories
@@ -177,5 +187,15 @@ public static class DataSeeder
 
         await context.Categories.AddRangeAsync(categories);
         await context.SaveChangesAsync();
+    }
+
+    private static async Task SeedCategoryRulesForSystemUserAsync(ApplicationDbContext context)
+    {
+        // Use a fixed system user ID for predefined rules
+        // This allows rules to be shared across all users without creating a real system user
+        var systemUserId = Guid.Parse("b47b33b5-11d0-4d55-a012-be51caa42a6f");
+
+        // Seed category rules
+        await CategoryRuleSeeder.SeedCategoryRulesAsync(context, systemUserId);
     }
 }

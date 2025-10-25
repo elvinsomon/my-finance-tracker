@@ -16,6 +16,7 @@ const Navbar = () => {
     { path: '/reports', label: 'Reports' },
     { path: '/savings-goals', label: 'Savings Goals' },
     { path: '/import', label: 'Import CSV' },
+    { path: '/category-rules', label: 'Category Rules' },
     { path: '/export', label: 'Export' },
   ];
 

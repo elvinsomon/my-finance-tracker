@@ -19,6 +19,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<SavingsGoal> SavingsGoals { get; set; }
     public DbSet<SavingsContribution> SavingsContributions { get; set; }
     public DbSet<ImportHistory> ImportHistories { get; set; }
+    public DbSet<CategoryRule> CategoryRules { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -56,19 +57,29 @@ public class ApplicationDbContext : DbContext
                 }
             }
 
-            // Set timestamps
+            // Set timestamps (handle both CreatedAt and CreatedDate naming conventions)
             if (entry.State == EntityState.Added)
             {
-                if (entry.Property("CreatedAt") != null)
-                    entry.Property("CreatedAt").CurrentValue = DateTime.UtcNow;
+                var createdAtProperty = entry.Properties.FirstOrDefault(p =>
+                    p.Metadata.Name == "CreatedAt" || p.Metadata.Name == "CreatedDate");
+                if (createdAtProperty != null)
+                {
+                    createdAtProperty.CurrentValue = DateTime.UtcNow;
+                }
 
-                if (entry.Property("UpdatedAt") != null)
-                    entry.Property("UpdatedAt").CurrentValue = DateTime.UtcNow;
+                var updatedAtProperty = entry.Properties.FirstOrDefault(p => p.Metadata.Name == "UpdatedAt");
+                if (updatedAtProperty != null)
+                {
+                    updatedAtProperty.CurrentValue = DateTime.UtcNow;
+                }
             }
             else if (entry.State == EntityState.Modified)
             {
-                if (entry.Property("UpdatedAt") != null)
-                    entry.Property("UpdatedAt").CurrentValue = DateTime.UtcNow;
+                var updatedAtProperty = entry.Properties.FirstOrDefault(p => p.Metadata.Name == "UpdatedAt");
+                if (updatedAtProperty != null)
+                {
+                    updatedAtProperty.CurrentValue = DateTime.UtcNow;
+                }
             }
         }
 

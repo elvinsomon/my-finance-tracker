@@ -44,6 +44,11 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
         builder.Property(t => t.IsImported)
             .HasDefaultValue(false);
 
+        builder.Property(t => t.SuggestedCategoryId);
+
+        builder.Property(t => t.CategoryConfidenceScore)
+            .HasColumnType("decimal(5,2)");
+
         builder.HasOne(t => t.User)
             .WithMany(u => u.Transactions)
             .HasForeignKey(t => t.UserId)

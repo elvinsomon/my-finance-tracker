@@ -15,6 +15,7 @@ public class UnitOfWork : IUnitOfWork
     private IExchangeRateRepository? _exchangeRates;
     private ISavingsGoalRepository? _savingsGoals;
     private IImportHistoryRepository? _importHistories;
+    private ICategoryRuleRepository? _categoryRules;
 
     public UnitOfWork(ApplicationDbContext context)
     {
@@ -44,6 +45,9 @@ public class UnitOfWork : IUnitOfWork
 
     public IImportHistoryRepository ImportHistories =>
         _importHistories ??= new ImportHistoryRepository(_context);
+
+    public ICategoryRuleRepository CategoryRules =>
+        _categoryRules ??= new CategoryRuleRepository(_context);
 
     public async Task<int> SaveChangesAsync()
     {

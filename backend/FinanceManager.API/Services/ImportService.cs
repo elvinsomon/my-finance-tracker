@@ -13,14 +13,23 @@ public class ImportService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMemoryCache _memoryCache;
+    private readonly DuplicateDetectionService _duplicateDetectionService;
+    private readonly CategoryRuleEngine _categoryRuleEngine;
     private readonly string _uploadBasePath;
     private const long MaxFileSizeBytes = 10 * 1024 * 1024; // 10MB
     private const int PreviewRowCount = 20;
 
-    public ImportService(IUnitOfWork unitOfWork, IMemoryCache memoryCache, IConfiguration configuration)
+    public ImportService(
+        IUnitOfWork unitOfWork,
+        IMemoryCache memoryCache,
+        DuplicateDetectionService duplicateDetectionService,
+        CategoryRuleEngine categoryRuleEngine,
+        IConfiguration configuration)
     {
         _unitOfWork = unitOfWork;
         _memoryCache = memoryCache;
+        _duplicateDetectionService = duplicateDetectionService;
+        _categoryRuleEngine = categoryRuleEngine;
         _uploadBasePath = configuration["FileStorage:ImportsPath"] ?? "/uploads/imports";
     }
 
@@ -54,6 +63,28 @@ public class ImportService
             // Determine if currency was detected from file or user-provided
             bool currencyDetected = parser.BankName.Contains("APAP", StringComparison.OrdinalIgnoreCase);
 
+            // Apply duplicate detection and auto-categorization to preview transactions
+            var previewTransactions = allTransactions.Take(PreviewRowCount).ToList();
+            foreach (var transaction in previewTransactions)
+            {
+                // Apply duplicate detection
+                var (dupStatus, existingId, dupReason) = await _duplicateDetectionService
+                    .CheckDuplicateAsync(transaction, financialAccountId, userId);
+
+                transaction.DuplicateStatus = dupStatus;
+                transaction.ExistingTransactionId = existingId;
+                transaction.DuplicateReason = dupReason;
+
+                // Apply auto-categorization
+                var (categoryId, categoryName, categoryConfidence, ruleName) = await _categoryRuleEngine
+                    .SuggestCategoryAsync(transaction.Description, userId);
+
+                transaction.SuggestedCategoryId = categoryId;
+                transaction.SuggestedCategoryName = categoryName;
+                transaction.ConfidenceScore = categoryConfidence;
+                transaction.MatchedRuleName = ruleName;
+            }
+
             response = new UploadCsvResponse
             {
                 UploadId = uploadId,
@@ -68,7 +99,7 @@ public class ImportService
                     RowCount = allTransactions.Count,
                     Encoding = "UTF-8"
                 },
-                Preview = allTransactions.Take(PreviewRowCount).ToList()
+                Preview = previewTransactions
             };
         }
 
