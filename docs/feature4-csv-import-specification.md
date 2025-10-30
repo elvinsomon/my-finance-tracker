@@ -1254,13 +1254,64 @@ Max Score = 1.00
 - Performance optimization
 - Advanced UX features
 
-### Total Implementation Time: ~5 hours (vs 5 weeks estimated)
+### Total Implementation Time: ~5.5 hours (vs 5 weeks estimated)
 ### Build Status: ✅ 0 errors, 1 warning (non-critical)
+
+### Critical Fixes Applied
+
+**Issue 1: Database Seeding Error** ✅
+- **Error**: `The property 'CategoryRule.CreatedAt' could not be found`
+- **Root Cause**: Inconsistencia entre naming conventions (`CreatedAt` vs `CreatedDate`)
+- **Fix**: Updated `ApplicationDbContext.SaveChangesAsync()` to handle both conventions
+- **File**: `FinanceManager.Infrastructure/Data/ApplicationDbContext.cs` (lines 60-83)
+- **Impact**: Migration and seeding now works for all entities
+
+**Issue 2: Auto-Categorization Not Working** ✅
+- **Error**: Categorías no se asignaban automáticamente en preview
+- **Root Cause**: `CategoryRuleEngine` only queried user rules, not system rules
+- **Fix**: Added systemUserId (`b47b33b5-11d0-4d55-a012-be51caa42a6f`) to WHERE clause
+- **File**: `FinanceManager.API/Services/CategoryRuleEngine.cs` (lines 31-41)
+- **Impact**: 37 predefined rules now work for all users
+
+**Issue 3: Pipe-Separated Patterns Not Evaluated** ✅
+- **Error**: Patterns like `"SUPERM|NACIONAL|SIRENA"` matched nothing
+- **Root Cause**: `EvaluateRule()` treated entire pattern as single string
+- **Fix**: Implemented split by pipe and individual pattern evaluation
+- **File**: `FinanceManager.API/Services/CategoryRuleEngine.cs` (lines 78-99)
+- **Impact**: OR logic now works correctly for all match types
 
 ---
 
-**Document Version:** 1.3
+**Document Version:** 1.4
 **Created:** 2024-10-24
-**Last Updated:** 2025-10-25
-**Author:** Claude (Requirements Analyst)
+**Last Updated:** 2025-10-25 18:30
+**Author:** Claude (Requirements Analyst) + Elvin Somon
 **Status:** 60% Implemented (Phases 1-3 completed)
+
+---
+
+## Change Log
+
+### Version 1.4 (2025-10-25 18:30)
+- ✅ Documented 3 critical fixes (seeding, auto-categorization, pipe patterns)
+- ✅ Updated implementation time to 5.5 hours
+- ✅ Added "Critical Fixes Applied" section
+- ✅ Updated all phase statuses
+
+### Version 1.3 (2025-10-25 14:00)
+- ✅ Marked Phases 2 and 3 as completed
+- ✅ Added predefined rules documentation (37 rules)
+- ✅ Added implementation summary
+
+### Version 1.2 (2025-10-24 16:00)
+- ✅ Marked Phase 1 as completed
+- ✅ Updated actual vs estimated time
+
+### Version 1.1 (2025-10-24 10:00)
+- ✅ Added Phase 1 implementation details
+- ✅ Refined API contracts
+
+### Version 1.0 (2024-10-24)
+- ✅ Initial specification document
+- ✅ All 5 phases planned
+- ✅ Technical architecture defined
