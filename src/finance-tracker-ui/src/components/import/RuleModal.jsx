@@ -1,6 +1,24 @@
 import { useState, useEffect } from 'react';
 import ErrorAlert from '../ErrorAlert';
 import LoadingSpinner from '../LoadingSpinner';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '../ui/dialog';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../ui/select';
+import { Checkbox } from '../ui/checkbox';
 
 const RuleModal = ({ isOpen, onClose, onSave, rule, categories }) => {
   const matchTypes = [
@@ -114,103 +132,94 @@ const RuleModal = ({ isOpen, onClose, onSave, rule, categories }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
-              {rule ? 'Edit Category Rule' : 'New Category Rule'}
-            </h2>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
-            >
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-gray-200/50 dark:border-gray-700/50 sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white">
+            {rule ? 'Edit Category Rule' : 'New Category Rule'}
+          </DialogTitle>
+          <DialogDescription className="text-gray-600 dark:text-gray-400">
+            {rule
+              ? 'Update the automatic categorization rule'
+              : 'Create a rule to automatically categorize transactions based on patterns'}
+          </DialogDescription>
+        </DialogHeader>
 
-          <ErrorAlert
-            message={error?.message}
-            errors={error?.errors}
-            onClose={() => setError(null)}
-          />
+        <ErrorAlert
+          message={error?.message}
+          errors={error?.errors}
+          onClose={() => setError(null)}
+        />
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+        <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="ruleName" className="text-gray-900 dark:text-gray-100">
                 Rule Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
+              </Label>
+              <Input
+                id="ruleName"
                 name="ruleName"
                 value={formData.ruleName}
                 onChange={handleChange}
                 required
                 placeholder="e.g., Supermarket Groceries"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
+                className="bg-white/50 dark:bg-slate-800/50 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+            <div className="space-y-2">
+              <Label htmlFor="categoryId" className="text-gray-900 dark:text-gray-100">
                 Category <span className="text-red-500">*</span>
-              </label>
-              <select
+              </Label>
+              <Select
                 name="categoryId"
                 value={formData.categoryId}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
+                onValueChange={(value) => handleChange({ target: { name: 'categoryId', value } })}
               >
-                <option value="">Select category...</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.icon} {category.name}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="bg-white/50 dark:bg-slate-800/50 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white">
+                  <SelectValue placeholder="Select category..." />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-slate-800 border-gray-200 dark:border-gray-700 max-h-[200px]">
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id} className="text-gray-900 dark:text-white">
+                      {category.icon} {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+            <div className="space-y-2">
+              <Label htmlFor="matchType" className="text-gray-900 dark:text-gray-100">
                 Match Type <span className="text-red-500">*</span>
-              </label>
-              <select
+              </Label>
+              <Select
                 name="matchType"
-                value={formData.matchType}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
+                value={formData.matchType.toString()}
+                onValueChange={(value) => handleChange({ target: { name: 'matchType', value } })}
               >
-                {matchTypes.map((type) => (
-                  <option key={type.value} value={type.value}>
-                    {type.label}
-                  </option>
-                ))}
-              </select>
-              <p className="mt-1 text-xs text-gray-500">
+                <SelectTrigger className="bg-white/50 dark:bg-slate-800/50 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-slate-800 border-gray-200 dark:border-gray-700">
+                  {matchTypes.map((type) => (
+                    <SelectItem key={type.value} value={type.value.toString()} className="text-gray-900 dark:text-white">
+                      {type.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 How the pattern should match transaction descriptions
               </p>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+            <div className="space-y-2">
+              <Label htmlFor="pattern" className="text-gray-900 dark:text-gray-100">
                 Pattern <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
+              </Label>
+              <Input
+                id="pattern"
                 name="pattern"
                 value={formData.pattern}
                 onChange={handleChange}
@@ -220,82 +229,87 @@ const RuleModal = ({ isOpen, onClose, onSave, rule, categories }) => {
                     ? "^WALMART.*"
                     : "WALMART"
                 }
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border font-mono text-sm"
+                className="bg-white/50 dark:bg-slate-800/50 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 font-mono text-sm"
               />
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 {parseInt(formData.matchType) === 4
                   ? "Enter a valid regex pattern"
                   : "Text to match in transaction descriptions"}
               </p>
             </div>
 
-            <div>
-              <label className="flex items-center text-sm font-medium text-gray-700 cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="caseSensitive"
-                  checked={formData.caseSensitive}
-                  onChange={handleChange}
-                  className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                Case Sensitive
-              </label>
-              <p className="mt-1 text-xs text-gray-500 ml-6">
-                When enabled, "walmart" and "WALMART" will be treated differently
-              </p>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="caseSensitive"
+                checked={formData.caseSensitive}
+                onCheckedChange={(checked) => handleChange({ target: { name: 'caseSensitive', type: 'checkbox', checked } })}
+                className="border-gray-300 dark:border-gray-600 data-[state=checked]:bg-blue-600 dark:data-[state=checked]:bg-blue-500"
+              />
+              <div>
+                <label
+                  htmlFor="caseSensitive"
+                  className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer"
+                >
+                  Case Sensitive
+                </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  When enabled, "walmart" and "WALMART" will be treated differently
+                </p>
+              </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+            <div className="space-y-2">
+              <Label htmlFor="priority" className="text-gray-900 dark:text-gray-100">
                 Priority <span className="text-red-500">*</span>
-              </label>
+              </Label>
               <div className="flex items-center space-x-4">
                 <input
+                  id="priority"
                   type="range"
                   name="priority"
                   value={formData.priority}
                   onChange={handleChange}
                   min="1"
                   max="100"
-                  className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600 dark:accent-blue-500"
                 />
-                <span className="text-sm font-medium text-gray-700 w-12 text-right">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300 w-12 text-right">
                   {formData.priority}
                 </span>
               </div>
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 Higher priority rules are evaluated first (1-100, default 50)
               </p>
             </div>
 
-            <div className="flex justify-end gap-3 pt-4 border-t">
-              <button
-                type="button"
-                onClick={onClose}
-                disabled={loading}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-              >
-                {loading ? (
-                  <>
-                    <LoadingSpinner size="sm" />
-                    <span>Saving...</span>
-                  </>
-                ) : (
-                  <span>{rule ? 'Update' : 'Create'}</span>
-                )}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200/50 dark:border-gray-700/50">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={loading}
+              className="border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={loading}
+              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg shadow-blue-500/30 disabled:opacity-50"
+            >
+              {loading ? (
+                <>
+                  <LoadingSpinner size="sm" />
+                  <span className="ml-2">Saving...</span>
+                </>
+              ) : (
+                <span>{rule ? 'Update Rule' : 'Create Rule'}</span>
+              )}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
 

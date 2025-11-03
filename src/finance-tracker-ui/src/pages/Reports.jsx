@@ -9,6 +9,13 @@ import ComparisonBarChart from '../components/reports/ComparisonBarChart';
 import CashflowAreaChart from '../components/reports/CashflowAreaChart';
 import TopExpensesTable from '../components/reports/TopExpensesTable';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   getSpendingByCategory,
   getTrends,
   getComparison,
@@ -147,22 +154,26 @@ const Reports = () => {
             </div>
             {activeTab === 'topExpenses' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Limit
                 </label>
-                <select
-                  value={topLimit}
-                  onChange={(e) => {
-                    setTopLimit(Number(e.target.value));
+                <Select
+                  value={String(topLimit)}
+                  onValueChange={(value) => {
+                    setTopLimit(Number(value));
                     setTopExpensesData(null);
                   }}
-                  className="px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 >
-                  <option value={5}>Top 5</option>
-                  <option value={10}>Top 10</option>
-                  <option value={20}>Top 20</option>
-                  <option value={50}>Top 50</option>
-                </select>
+                  <SelectTrigger className="w-full bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
+                    <SelectValue placeholder="Select limit" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="5">Top 5</SelectItem>
+                    <SelectItem value="10">Top 10</SelectItem>
+                    <SelectItem value="20">Top 20</SelectItem>
+                    <SelectItem value="50">Top 50</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             )}
             <button
@@ -177,23 +188,27 @@ const Reports = () => {
         return (
           <div className="flex gap-4 items-end">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Period (Months)
               </label>
-              <select
-                value={months}
-                onChange={(e) => {
-                  setMonths(Number(e.target.value));
+              <Select
+                value={String(months)}
+                onValueChange={(value) => {
+                  setMonths(Number(value));
                   setTrendsData(null);
                 }}
-                className="px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               >
-                <option value={3}>3 Months</option>
-                <option value={6}>6 Months</option>
-                <option value={12}>12 Months</option>
-                <option value={18}>18 Months</option>
-                <option value={24}>24 Months</option>
-              </select>
+                <SelectTrigger className="w-full bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
+                  <SelectValue placeholder="Select period" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="3">3 Months</SelectItem>
+                  <SelectItem value="6">6 Months</SelectItem>
+                  <SelectItem value="12">12 Months</SelectItem>
+                  <SelectItem value="18">18 Months</SelectItem>
+                  <SelectItem value="24">24 Months</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <button
               onClick={handleRefresh}
@@ -207,21 +222,25 @@ const Reports = () => {
         return (
           <div className="flex gap-4 items-end">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Year
               </label>
-              <select
-                value={year}
-                onChange={(e) => {
-                  setYear(Number(e.target.value));
+              <Select
+                value={String(year)}
+                onValueChange={(value) => {
+                  setYear(Number(value));
                   setCashflowData(null);
                 }}
-                className="px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               >
-                {Array.from({ length: 5 }, (_, i) => currentDate.getFullYear() - i).map(y => (
-                  <option key={y} value={y}>{y}</option>
-                ))}
-              </select>
+                <SelectTrigger className="w-full bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
+                  <SelectValue placeholder="Select year" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: 5 }, (_, i) => currentDate.getFullYear() - i).map(y => (
+                    <SelectItem key={y} value={String(y)}>{y}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <button
               onClick={handleRefresh}

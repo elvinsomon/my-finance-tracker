@@ -1,6 +1,6 @@
 import { format, parseISO } from 'date-fns';
 
-export const formatCurrency = (amount, currency = 'DOP') => {
+export const formatCurrency = (amount, currency = 'DOP', options = {}) => {
   const symbols = {
     DOP: 'RD$',
     USD: '$',
@@ -8,10 +8,13 @@ export const formatCurrency = (amount, currency = 'DOP') => {
   };
 
   const symbol = symbols[currency] || currency;
-  const formattedAmount = new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(amount);
+  const formatOptions = {
+    minimumFractionDigits: options.notation === 'compact' ? 0 : 2,
+    maximumFractionDigits: options.notation === 'compact' ? 1 : 2,
+    ...options,
+  };
+
+  const formattedAmount = new Intl.NumberFormat('en-US', formatOptions).format(amount);
 
   return `${symbol}${formattedAmount}`;
 };

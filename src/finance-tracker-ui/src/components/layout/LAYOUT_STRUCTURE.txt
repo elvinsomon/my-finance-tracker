@@ -1,0 +1,221 @@
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                           MAINLAYOUT STRUCTURE                                      │
+│                                                                                     │
+│  Background Layers (Fixed, -z-10):                                                 │
+│  ┌─────────────────────────────────────────────────────────────────────────────┐   │
+│  │ Layer 1: Gradient (white→gray→blue / slate→blue)                           │   │
+│  │ Layer 2: Dot Pattern (24px grid, 3-5% opacity)                             │   │
+│  │ Layer 3: Blur Orbs (blue top-left, purple bottom-right)                    │   │
+│  └─────────────────────────────────────────────────────────────────────────────┘   │
+│                                                                                     │
+│  ┌─────────────────────────────────────────────────────────────────────────────┐   │
+│  │                      MOBILE OVERLAY (z-40, < 1024px)                        │   │
+│  │              Semi-transparent backdrop with blur                            │   │
+│  │              Only visible when mobile sidebar is open                       │   │
+│  └─────────────────────────────────────────────────────────────────────────────┘   │
+│                                                                                     │
+│  Layout Grid (flex):                                                                │
+│  ┌──────────────────────┬──────────────────────────────────────────────────────┐   │
+│  │                      │                                                      │   │
+│  │     SIDEBAR          │              CONTENT AREA                            │   │
+│  │     (z-30/50)        │              (flex-1)                                │   │
+│  │                      │                                                      │   │
+│  │  Desktop (≥1024px):  │  ┌────────────────────────────────────────────────┐ │   │
+│  │  • Fixed left        │  │           TOPBAR (z-20, sticky)                │ │   │
+│  │  • 256px expanded    │  │                                                │ │   │
+│  │  • 80px collapsed    │  │  ┌──────────────────────────────────────────┐  │ │   │
+│  │  • Glass background  │  │  │ Mobile Menu │ Breadcrumbs                │  │ │   │
+│  │                      │  │  └──────────────────────────────────────────┘  │ │   │
+│  │  Mobile (<1024px):   │  │  ┌──────────────────────────────────────────┐  │ │   │
+│  │  • Overlay (z-50)    │  │  │ Search │ Theme │ Notifications │ User    │  │ │   │
+│  │  • Hidden default    │  │  └──────────────────────────────────────────┘  │ │   │
+│  │  • 256px width       │  └────────────────────────────────────────────────┘ │   │
+│  │  • Slides from left  │                                                      │   │
+│  │                      │  ┌────────────────────────────────────────────────┐ │   │
+│  │  ┌────────────────┐  │  │         MAIN CONTENT (flex-1, scroll)          │ │   │
+│  │  │ Logo + Toggle  │  │  │                                                │ │   │
+│  │  ├────────────────┤  │  │  ┌──────────────────────────────────────────┐  │ │   │
+│  │  │                │  │  │  │  <motion.div> (AnimatePresence)          │  │ │   │
+│  │  │   Navigation   │  │  │  │  • Fade + slide animation               │  │ │   │
+│  │  │   Menu Items   │  │  │  │  • 250ms duration                       │  │ │   │
+│  │  │                │  │  │  │  • p-4 sm:p-6 lg:p-8                    │  │ │   │
+│  │  │  • Dashboard   │  │  │  │  • max-w-7xl mx-auto                    │  │ │   │
+│  │  │  • Trans...    │  │  │  │                                         │  │ │   │
+│  │  │  • Catego...   │  │  │  │  ┌────────────────────────────────┐     │  │ │   │
+│  │  │  • Budgets     │  │  │  │  │      PAGE CONTENT              │     │  │ │   │
+│  │  │  • Accounts    │  │  │  │  │                                │     │  │ │   │
+│  │  │  • Savings     │  │  │  │  │  {children}                    │     │  │ │   │
+│  │  │  • Reports     │  │  │  │  │                                │     │  │ │   │
+│  │  │  • Import      │  │  │  │  │  • Glass cards                 │     │  │ │   │
+│  │  │  • Export      │  │  │  │  │  • Responsive grids            │     │  │ │   │
+│  │  │                │  │  │  │  │  • Dark mode support           │     │  │ │   │
+│  │  │                │  │  │  │  └────────────────────────────────┘     │  │ │   │
+│  │  │                │  │  │  │                                         │  │ │   │
+│  │  └────────────────┘  │  │  └──────────────────────────────────────────┘  │ │   │
+│  │                      │  │                                                │ │   │
+│  └──────────────────────┘  └────────────────────────────────────────────────┘ │   │
+│                                                                                     │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+
+
+RESPONSIVE BREAKPOINTS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Mobile (< 1024px):
+┌─────────────────────────────────────┐
+│  ┌───────────────────────────────┐  │
+│  │       TopBar (full width)     │  │
+│  │  [Menu] Breadcrumbs  [Icons]  │  │
+│  └───────────────────────────────┘  │
+│  ┌───────────────────────────────┐  │
+│  │                               │  │
+│  │        Page Content           │  │
+│  │        (full width)           │  │
+│  │                               │  │
+│  └───────────────────────────────┘  │
+└─────────────────────────────────────┘
+
+Mobile with Sidebar Open:
+┌──────────┬──────────────────────────┐
+│          │░░░░░░░░░░░░░░░░░░░░░░░░░░│
+│ Sidebar  │░ TopBar (dimmed)        ░│
+│ (overlay)│░░░░░░░░░░░░░░░░░░░░░░░░░░│
+│          │░                        ░│
+│ [X]      │░  Content (dimmed)      ░│
+│          │░  Backdrop visible      ░│
+│ • Item   │░                        ░│
+│ • Item   │░  Click backdrop        ░│
+│          │░  to close sidebar      ░│
+└──────────┴──────────────────────────┘
+   256px         Remaining width
+
+
+Desktop Expanded (≥ 1024px):
+┌──────────┬────────────────────────────────────────┐
+│          │  ┌──────────────────────────────────┐  │
+│          │  │         TopBar                   │  │
+│  Sidebar │  │  Breadcrumbs    Search [Icons]   │  │
+│          │  └──────────────────────────────────┘  │
+│  [<]     │  ┌──────────────────────────────────┐  │
+│          │  │                                  │  │
+│ • Dash   │  │        Page Content              │  │
+│ • Trans  │  │        (max-w-7xl)               │  │
+│ • Categ  │  │                                  │  │
+│ • Budget │  │                                  │  │
+│          │  │                                  │  │
+└──────────┴──┴──────────────────────────────────┴──┘
+   256px              Remaining width
+
+
+Desktop Collapsed (≥ 1024px):
+┌────┬────────────────────────────────────────────┐
+│    │  ┌──────────────────────────────────────┐  │
+│    │  │         TopBar                       │  │
+│ S  │  │  Breadcrumbs      Search [Icons]     │  │
+│ [>]│  └──────────────────────────────────────┘  │
+│    │  ┌──────────────────────────────────────┐  │
+│ [D]│  │                                      │  │
+│ [T]│  │        Page Content                  │  │
+│ [C]│  │        (max-w-7xl)                   │  │
+│ [B]│  │                                      │  │
+│    │  │                                      │  │
+└────┴──┴──────────────────────────────────────┴──┘
+ 80px           Remaining width
+
+
+ANIMATION FLOW:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Route Change (Dashboard → Transactions):
+
+  1. EXIT Animation (Dashboard):
+     ┌─────────────────────┐
+     │    Dashboard        │  opacity: 1 → 0
+     │                     │  y: 0 → -20px
+     │  [Fading out...]    │  duration: 250ms
+     └─────────────────────┘
+
+  2. DOM Update:
+     AnimatePresence mode="wait" ensures exit completes
+
+  3. ENTER Animation (Transactions):
+     ┌─────────────────────┐
+     │                     │  opacity: 0 → 1
+     │   Transactions      │  y: 20px → 0
+     │  [Sliding in...]    │  duration: 250ms
+     └─────────────────────┘
+
+
+Sidebar Toggle (Expanded → Collapsed):
+
+  Desktop:
+  ┌────────────┐         ┌────┐
+  │  Sidebar   │  300ms  │ S  │
+  │            │  ═════> │    │
+  │ • Items    │  ease   │ [I]│
+  └────────────┘         └────┘
+     256px                80px
+
+  Mobile:
+  ┌────────────┐         ┌────────────┐
+  │  Sidebar   │  300ms  │            │
+  │  x: 0      │  ═════> │  x: -100%  │
+  │  visible   │  ease   │  hidden    │
+  └────────────┘         └────────────┘
+
+
+GLASS CARD LAYERS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+┌───────────────────────────────────────┐
+│  Glass Card (stacked layers)          │
+│                                       │
+│  └─ Shadow (gray-200/50)              │
+│     └─ Border (gray-200/50, 1px)      │
+│        └─ Background (white/70)       │
+│           └─ Backdrop Blur (xl)       │
+│              └─ Content               │
+│                                       │
+│  Hover: shadow-lg → shadow-xl         │
+│  Transition: 300ms ease               │
+└───────────────────────────────────────┘
+
+
+Z-INDEX STACK:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+z-50: Sidebar (mobile)
+z-40: Mobile overlay backdrop
+z-30: Sidebar (desktop), TopBar
+z-20: Page content
+z-10: Default layer
+-z-10: Background layers
+
+
+STATE MANAGEMENT:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+MainLayout manages:
+  • isSidebarCollapsed (boolean) - Desktop sidebar state
+  • isMobileSidebarOpen (boolean) - Mobile sidebar visibility
+
+Passed to:
+  • Sidebar (all states + handlers)
+  • TopBar (onMenuClick, isSidebarCollapsed)
+
+Updates on:
+  • Desktop toggle button click → toggleSidebar()
+  • Mobile menu button click → toggleMobileSidebar()
+  • Mobile backdrop click → closeMobileSidebar()
+  • Mobile menu item click → closeMobileSidebar()
+
+
+CONTENT FLOW:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+App.jsx
+  └─ ProtectedRoute (auth check)
+      └─ MainLayout
+          └─ Outlet (renders matched route)
+              └─ Page Component
+                  └─ Your Content

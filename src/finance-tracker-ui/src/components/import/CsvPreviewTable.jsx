@@ -1,5 +1,12 @@
 import { useState } from 'react';
 import { AlertCircle, CheckCircle2, ExternalLink } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const CsvPreviewTable = ({ transactions, categories, onCategoryChange, onOverrideChange }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -125,59 +132,69 @@ const CsvPreviewTable = ({ transactions, categories, onCategoryChange, onOverrid
   return (
     <div className="space-y-4">
       {/* Summary Header */}
-      <div className="bg-white rounded-lg shadow p-4">
+      <div className="bg-white dark:bg-slate-900 rounded-lg shadow p-4">
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 text-center">
           <div>
-            <div className="text-2xl font-bold text-gray-900">
+            <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
               {transactions.length}
             </div>
-            <div className="text-sm text-gray-600">Total Rows</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Total Rows</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
               {newCount}
             </div>
-            <div className="text-sm text-gray-600">New</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">New</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-yellow-600">
+            <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
               {duplicatesCount}
             </div>
-            <div className="text-sm text-gray-600">Duplicates</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Duplicates</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
               {validCount}
             </div>
-            <div className="text-sm text-gray-600">Valid</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Valid</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-red-600">
+            <div className="text-2xl font-bold text-red-600 dark:text-red-400">
               {invalidCount}
             </div>
-            <div className="text-sm text-gray-600">Invalid</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Invalid</div>
           </div>
         </div>
       </div>
 
       {/* Filter Section */}
-      <div className="bg-white rounded-lg shadow p-4">
+      <div className="bg-white dark:bg-slate-900 rounded-lg shadow p-4">
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
             Show:
           </label>
-          <select
+          <Select
             value={statusFilter}
-            onChange={(e) => {
-              setStatusFilter(e.target.value);
+            onValueChange={(value) => {
+              setStatusFilter(value);
               setCurrentPage(1);
             }}
-            className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border text-sm"
           >
-            <option value="all">All Transactions ({transactions.length})</option>
-            <option value="new">Only New ({newCount})</option>
-            <option value="duplicates">Only Duplicates ({duplicatesCount})</option>
-          </select>
+            <SelectTrigger className="w-64 bg-white dark:bg-slate-800 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-white dark:bg-slate-800 border-gray-200 dark:border-gray-700">
+              <SelectItem value="all" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-slate-700">
+                All Transactions ({transactions.length})
+              </SelectItem>
+              <SelectItem value="new" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-slate-700">
+                Only New ({newCount})
+              </SelectItem>
+              <SelectItem value="duplicates" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-slate-700">
+                Only Duplicates ({duplicatesCount})
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -274,56 +291,69 @@ const CsvPreviewTable = ({ transactions, categories, onCategoryChange, onOverrid
                       {transaction.suggestedCategoryId && transaction.categorySuggestion ? (
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-gray-900">
+                            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
                               {getCategoryIcon(transaction.suggestedCategoryId)}{' '}
                               {getCategoryName(transaction.suggestedCategoryId)}
                             </span>
                             {getConfidenceBadge(transaction.categorySuggestion.confidence)}
                           </div>
                           {transaction.categorySuggestion.matchedRuleName && (
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-gray-500 dark:text-gray-400">
                               Rule: {transaction.categorySuggestion.matchedRuleName}
                             </div>
                           )}
-                          <select
+                          <Select
                             value={transaction.suggestedCategoryId || ''}
-                            onChange={(e) => onCategoryChange(
-                              transaction.rowNumber,
-                              e.target.value
-                            )}
+                            onValueChange={(value) => onCategoryChange(transaction.rowNumber, value)}
                             disabled={!transaction.isValid}
-                            className="text-xs w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 mt-1"
                           >
-                            <option value="">Change category...</option>
-                            {categories.map((category) => (
-                              <option key={category.id} value={category.id}>
-                                {category.icon} {category.name}
-                              </option>
-                            ))}
-                          </select>
+                            <SelectTrigger className="h-8 text-xs w-full bg-white dark:bg-slate-800 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 mt-1">
+                              <SelectValue placeholder="Change category..." />
+                            </SelectTrigger>
+                            <SelectContent className="bg-white dark:bg-slate-800 border-gray-200 dark:border-gray-700">
+                              <SelectItem value="" className="text-xs text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-slate-700">
+                                Change category...
+                              </SelectItem>
+                              {categories.map((category) => (
+                                <SelectItem
+                                  key={category.id}
+                                  value={category.id}
+                                  className="text-xs text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-slate-700"
+                                >
+                                  {category.icon} {category.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
                       ) : (
-                        <select
+                        <Select
                           value={transaction.suggestedCategoryId || ''}
-                          onChange={(e) => onCategoryChange(
-                            transaction.rowNumber,
-                            e.target.value
-                          )}
+                          onValueChange={(value) => onCategoryChange(transaction.rowNumber, value)}
                           disabled={!transaction.isValid}
-                          className={`
-                            text-sm rounded-md border-gray-300 shadow-sm
-                            focus:border-blue-500 focus:ring-blue-500
-                            ${!transaction.isValid ? 'opacity-50 cursor-not-allowed' : ''}
-                            ${!transaction.suggestedCategoryId && transaction.isValid ? 'border-red-300' : ''}
-                          `}
                         >
-                          <option value="">Select category...</option>
-                          {categories.map((category) => (
-                            <option key={category.id} value={category.id}>
-                              {category.icon} {category.name}
-                            </option>
-                          ))}
-                        </select>
+                          <SelectTrigger className={`h-9 text-sm w-full bg-white dark:bg-slate-800 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 ${
+                            !transaction.isValid ? 'opacity-50 cursor-not-allowed' : ''
+                          } ${
+                            !transaction.suggestedCategoryId && transaction.isValid ? 'border-red-300 dark:border-red-600' : ''
+                          }`}>
+                            <SelectValue placeholder="Select category..." />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white dark:bg-slate-800 border-gray-200 dark:border-gray-700">
+                            <SelectItem value="" className="text-sm text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-slate-700">
+                              Select category...
+                            </SelectItem>
+                            {categories.map((category) => (
+                              <SelectItem
+                                key={category.id}
+                                value={category.id}
+                                className="text-sm text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-slate-700"
+                              >
+                                {category.icon} {category.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       )}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">

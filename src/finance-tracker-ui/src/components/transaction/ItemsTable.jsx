@@ -1,4 +1,11 @@
 import { useState, useEffect } from 'react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const ItemsTable = ({ items, categories, onItemsChange, currency }) => {
   const [localItems, setLocalItems] = useState(items || []);
@@ -76,33 +83,33 @@ const ItemsTable = ({ items, categories, onItemsChange, currency }) => {
   return (
     <div className="space-y-3">
       <div className="overflow-x-auto">
-        <table className="min-w-full border border-gray-300 rounded-lg">
-          <thead className="bg-gray-100">
+        <table className="min-w-full border border-gray-300 dark:border-gray-600 rounded-lg">
+          <thead className="bg-gray-100 dark:bg-slate-700">
             <tr>
-              <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600">
                 Category
               </th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600">
                 Description
               </th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b w-24">
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600 w-24">
                 Quantity
               </th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b w-28">
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600 w-28">
                 Unit Price
               </th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b w-28">
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600 w-28">
                 Total
               </th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b w-16">
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600 w-16">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-gray-700">
             {localItems.length === 0 ? (
               <tr>
-                <td colSpan="6" className="px-3 py-8 text-center text-gray-500 text-sm">
+                <td colSpan="6" className="px-3 py-8 text-center text-gray-500 dark:text-gray-400 text-sm">
                   No items added yet. Click "Add Item" to start.
                 </td>
               </tr>
@@ -112,65 +119,75 @@ const ItemsTable = ({ items, categories, onItemsChange, currency }) => {
                 const hasErrors = errors.length > 0 && item.description.trim() !== '';
 
                 return (
-                  <tr key={index} className={hasErrors ? 'bg-red-50' : ''}>
-                    <td className="px-3 py-2 border-b">
-                      <select
+                  <tr key={index} className={hasErrors ? 'bg-red-50 dark:bg-red-900/20' : ''}>
+                    <td className="px-3 py-2 border-b border-gray-200 dark:border-gray-700">
+                      <Select
                         value={item.categoryId || ''}
-                        onChange={(e) => handleItemChange(index, 'categoryId', e.target.value || null)}
-                        className="w-full py-1 px-2 text-sm border border-gray-300 rounded focus:border-blue-500 focus:ring-blue-500"
+                        onValueChange={(value) => handleItemChange(index, 'categoryId', value || null)}
                       >
-                        <option value="">Use transaction category</option>
-                        {categories.map((category) => (
-                          <option key={category.id} value={category.id}>
-                            {category.icon} {category.name}
-                          </option>
-                        ))}
-                      </select>
+                        <SelectTrigger className="w-full h-8 text-sm bg-white dark:bg-slate-800 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
+                          <SelectValue placeholder="Use transaction category" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white dark:bg-slate-800 border-gray-200 dark:border-gray-700">
+                          <SelectItem value="" className="text-sm text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-slate-700">
+                            Use transaction category
+                          </SelectItem>
+                          {categories.map((category) => (
+                            <SelectItem
+                              key={category.id}
+                              value={category.id}
+                              className="text-sm text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-slate-700"
+                            >
+                              {category.icon} {category.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </td>
-                    <td className="px-3 py-2 border-b">
+                    <td className="px-3 py-2 border-b border-gray-200 dark:border-gray-700">
                       <input
                         type="text"
                         value={item.description}
                         onChange={(e) => handleItemChange(index, 'description', e.target.value)}
                         placeholder="Item description"
-                        className={`w-full py-1 px-2 text-sm border rounded focus:border-blue-500 focus:ring-blue-500 ${
-                          hasErrors ? 'border-red-300' : 'border-gray-300'
+                        className={`w-full py-1 px-2 text-sm border rounded focus:border-blue-500 focus:ring-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 ${
+                          hasErrors ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
                         }`}
                         required
                       />
                     </td>
-                    <td className="px-3 py-2 border-b">
+                    <td className="px-3 py-2 border-b border-gray-200 dark:border-gray-700">
                       <input
                         type="number"
                         value={item.quantity}
                         onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
                         min="0.01"
                         step="0.01"
-                        className="w-full py-1 px-2 text-sm border border-gray-300 rounded focus:border-blue-500 focus:ring-blue-500"
+                        className="w-full py-1 px-2 text-sm border border-gray-300 dark:border-gray-600 rounded focus:border-blue-500 focus:ring-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100"
                         required
                       />
                     </td>
-                    <td className="px-3 py-2 border-b">
+                    <td className="px-3 py-2 border-b border-gray-200 dark:border-gray-700">
                       <input
                         type="number"
                         value={item.unitPrice}
                         onChange={(e) => handleItemChange(index, 'unitPrice', e.target.value)}
                         min="0"
                         step="0.01"
-                        className="w-full py-1 px-2 text-sm border border-gray-300 rounded focus:border-blue-500 focus:ring-blue-500"
+                        className="w-full py-1 px-2 text-sm border border-gray-300 dark:border-gray-600 rounded focus:border-blue-500 focus:ring-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100"
                         required
                       />
                     </td>
-                    <td className="px-3 py-2 border-b">
-                      <div className="py-1 px-2 text-sm font-medium text-gray-700">
+                    <td className="px-3 py-2 border-b border-gray-200 dark:border-gray-700">
+                      <div className="py-1 px-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                         {formatCurrency(item.totalAmount)}
                       </div>
                     </td>
-                    <td className="px-3 py-2 border-b text-center">
+                    <td className="px-3 py-2 border-b border-gray-200 dark:border-gray-700 text-center">
                       <button
                         type="button"
                         onClick={() => handleRemoveItem(index)}
-                        className="text-red-600 hover:text-red-800 font-bold text-lg"
+                        className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 font-bold text-lg"
                         title="Remove item"
                       >
                         ×
@@ -181,12 +198,12 @@ const ItemsTable = ({ items, categories, onItemsChange, currency }) => {
               })
             )}
           </tbody>
-          <tfoot className="bg-gray-50">
+          <tfoot className="bg-gray-50 dark:bg-slate-700">
             <tr>
-              <td colSpan="4" className="px-3 py-2 text-right font-medium text-gray-700">
+              <td colSpan="4" className="px-3 py-2 text-right font-medium text-gray-700 dark:text-gray-300">
                 Total:
               </td>
-              <td className="px-3 py-2 font-bold text-gray-900">
+              <td className="px-3 py-2 font-bold text-gray-900 dark:text-gray-100">
                 {formatCurrency(calculateTotal())}
               </td>
               <td></td>
@@ -198,7 +215,7 @@ const ItemsTable = ({ items, categories, onItemsChange, currency }) => {
       <button
         type="button"
         onClick={handleAddItem}
-        className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-1"
+        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium flex items-center gap-1"
       >
         <svg
           className="h-5 w-5"

@@ -9,6 +9,13 @@ import ImportSummary from '../components/import/ImportSummary';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorAlert from '../components/ErrorAlert';
 import { CheckCircle2 } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const Import = () => {
   const navigate = useNavigate();
@@ -307,7 +314,7 @@ const Import = () => {
   );
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div>
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Import CSV</h1>
         <p className="text-gray-600 mt-2">
@@ -331,41 +338,47 @@ const Import = () => {
           <div className="space-y-6">
             {/* Account Selector */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Financial Account <span className="text-red-500">*</span>
               </label>
-              <select
+              <Select
                 value={selectedAccountId}
-                onChange={(e) => setSelectedAccountId(e.target.value)}
-                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
+                onValueChange={setSelectedAccountId}
                 disabled={loading}
               >
-                <option value="">Select an account...</option>
-                {accounts.map((account) => (
-                  <option key={account.id} value={account.id}>
-                    {account.name} ({account.accountType})
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="w-full bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
+                  <SelectValue placeholder="Select an account..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {accounts.map((account) => (
+                    <SelectItem key={account.id} value={account.id}>
+                      {account.name} ({account.accountType})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Currency Selector */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Currency <span className="text-red-500">*</span>
               </label>
-              <select
+              <Select
                 value={selectedCurrency}
-                onChange={(e) => setSelectedCurrency(e.target.value)}
-                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
+                onValueChange={setSelectedCurrency}
                 disabled={loading}
               >
-                <option value="">Select currency...</option>
-                <option value="DOP">DOP - Dominican Peso</option>
-                <option value="USD">USD - US Dollar</option>
-                <option value="EUR">EUR - Euro</option>
-              </select>
-              <p className="mt-1 text-sm text-gray-500">
+                <SelectTrigger className="w-full bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
+                  <SelectValue placeholder="Select currency..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="DOP">DOP - Dominican Peso</SelectItem>
+                  <SelectItem value="USD">USD - US Dollar</SelectItem>
+                  <SelectItem value="EUR">EUR - Euro</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 Select the currency used in your CSV file
               </p>
             </div>

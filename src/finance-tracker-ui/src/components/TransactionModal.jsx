@@ -4,6 +4,23 @@ import ErrorAlert from './ErrorAlert';
 import LoadingSpinner from './LoadingSpinner';
 import CurrencySelector from './CurrencySelector';
 import ItemsTable from './transaction/ItemsTable';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const TransactionModal = ({ transaction, categories, accounts, onClose }) => {
   const [formData, setFormData] = useState({
@@ -127,274 +144,293 @@ const TransactionModal = ({ transaction, categories, accounts, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
-              {transaction ? 'Edit Transaction' : 'New Transaction'}
-            </h2>
-            <button
-              onClick={() => onClose(false)}
-              className="text-gray-400 hover:text-gray-600"
-            >
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+    <Dialog open={true} onOpenChange={() => onClose(false)}>
+      <DialogContent className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-gray-200/50 dark:border-gray-700/50 sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white">
+            {transaction ? 'Edit Transaction' : 'New Transaction'}
+          </DialogTitle>
+          <DialogDescription className="text-gray-600 dark:text-gray-400">
+            {transaction ? 'Update transaction details' : 'Add a new financial transaction'}
+          </DialogDescription>
+        </DialogHeader>
+
+        <ErrorAlert
+          message={error?.message}
+          errors={error?.errors}
+          onClose={() => setError(null)}
+        />
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="accountId" className="text-gray-700 dark:text-gray-300">
+                Account *
+              </Label>
+              <Select
+                value={formData.accountId}
+                onValueChange={(value) => setFormData({ ...formData, accountId: value })}
+                required
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-
-          <ErrorAlert
-            message={error?.message}
-            errors={error?.errors}
-            onClose={() => setError(null)}
-          />
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Account *
-                </label>
-                <select
-                  name="accountId"
-                  value={formData.accountId}
-                  onChange={handleChange}
-                  required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
-                >
-                  <option value="">Select account</option>
+                <SelectTrigger className="bg-white/50 dark:bg-slate-800/50 border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100">
+                  <SelectValue placeholder="Select account" />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-slate-800 border-gray-200 dark:border-gray-700">
                   {accounts.map((account) => (
-                    <option key={account.id} value={account.id}>
+                    <SelectItem
+                      key={account.id}
+                      value={account.id}
+                      className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-slate-700"
+                    >
                       {account.name}
-                    </option>
+                    </SelectItem>
                   ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Category *
-                </label>
-                <select
-                  name="categoryId"
-                  value={formData.categoryId}
-                  onChange={handleChange}
-                  required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
-                >
-                  <option value="">Select category</option>
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.icon} {category.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Type *
-                </label>
-                <select
-                  name="type"
-                  value={formData.type}
-                  onChange={handleChange}
-                  required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
-                >
-                  <option value="Income">Income</option>
-                  <option value="Expense">Expense</option>
-                  <option value="Transfer">Transfer</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Date *
-                </label>
-                <input
-                  type="date"
-                  name="date"
-                  value={formData.date}
-                  onChange={handleChange}
-                  required
-                  max={new Date().toISOString().split('T')[0]}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Amount *
-                </label>
-                <input
-                  type="number"
-                  name="amount"
-                  value={formData.amount}
-                  onChange={handleChange}
-                  required
-                  min="0.01"
-                  step="0.01"
-                  placeholder="0.00"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Currency *
-                </label>
-                <CurrencySelector
-                  value={formData.currency}
-                  onChange={handleChange}
-                  name="currency"
-                />
-              </div>
+                </SelectContent>
+              </Select>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Description *
-              </label>
-              <input
-                type="text"
-                name="description"
-                value={formData.description}
+            <div className="space-y-2">
+              <Label htmlFor="categoryId" className="text-gray-700 dark:text-gray-300">
+                Category *
+              </Label>
+              <Select
+                value={formData.categoryId}
+                onValueChange={(value) => setFormData({ ...formData, categoryId: value })}
+                required
+              >
+                <SelectTrigger className="bg-white/50 dark:bg-slate-800/50 border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-slate-800 border-gray-200 dark:border-gray-700">
+                  {categories.map((category) => (
+                    <SelectItem
+                      key={category.id}
+                      value={category.id}
+                      className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-slate-700"
+                    >
+                      {category.icon} {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="type" className="text-gray-700 dark:text-gray-300">
+                Type *
+              </Label>
+              <Select
+                value={formData.type}
+                onValueChange={(value) => setFormData({ ...formData, type: value })}
+                required
+              >
+                <SelectTrigger className="bg-white/50 dark:bg-slate-800/50 border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100">
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-slate-800 border-gray-200 dark:border-gray-700">
+                  <SelectItem value="Income" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-slate-700">
+                    Income
+                  </SelectItem>
+                  <SelectItem value="Expense" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-slate-700">
+                    Expense
+                  </SelectItem>
+                  <SelectItem value="Transfer" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-slate-700">
+                    Transfer
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="date" className="text-gray-700 dark:text-gray-300">
+                Date *
+              </Label>
+              <Input
+                type="date"
+                id="date"
+                name="date"
+                value={formData.date}
                 onChange={handleChange}
                 required
-                placeholder="Brief description"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
+                max={new Date().toISOString().split('T')[0]}
+                className="bg-white/50 dark:bg-slate-800/50 border-gray-200 dark:border-gray-700 focus-visible:ring-blue-500 dark:focus-visible:ring-blue-400 text-gray-900 dark:text-gray-100"
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Payment Method
-                </label>
-                <input
-                  type="text"
-                  name="paymentMethod"
-                  value={formData.paymentMethod}
-                  onChange={handleChange}
-                  placeholder="e.g., Credit Card, Cash"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Merchant
-                </label>
-                <input
-                  type="text"
-                  name="merchant"
-                  value={formData.merchant}
-                  onChange={handleChange}
-                  placeholder="e.g., Store name"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Notes
-              </label>
-              <textarea
-                name="notes"
-                value={formData.notes}
+            <div className="space-y-2">
+              <Label htmlFor="amount" className="text-gray-700 dark:text-gray-300">
+                Amount *
+              </Label>
+              <Input
+                type="number"
+                id="amount"
+                name="amount"
+                value={formData.amount}
                 onChange={handleChange}
-                rows="3"
-                placeholder="Additional notes (optional)"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
-              ></textarea>
+                required
+                min="0.01"
+                step="0.01"
+                placeholder="0.00"
+                className="bg-white/50 dark:bg-slate-800/50 border-gray-200 dark:border-gray-700 focus-visible:ring-blue-500 dark:focus-visible:ring-blue-400 text-gray-900 dark:text-gray-100"
+              />
             </div>
 
-            <div className="border-t pt-4">
-              <div className="flex items-center justify-between mb-3">
-                <label className="flex items-center text-sm font-medium text-gray-700 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={showItems}
-                    onChange={(e) => {
-                      setShowItems(e.target.checked);
-                      if (!e.target.checked) {
-                        setItems([]);
-                      }
-                    }}
-                    className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                  />
-                  Add detailed items (optional)
-                </label>
-                {items.length > 0 && (
-                  <span className="text-xs text-gray-500">
-                    {items.length} item{items.length !== 1 ? 's' : ''}
-                  </span>
-                )}
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="currency" className="text-gray-700 dark:text-gray-300">
+                Currency *
+              </Label>
+              <CurrencySelector
+                value={formData.currency}
+                onChange={handleChange}
+                name="currency"
+              />
+            </div>
+          </div>
 
-              {showItems && (
-                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                  <ItemsTable
-                    items={items}
-                    categories={categories}
-                    onItemsChange={setItems}
-                    currency={formData.currency}
-                  />
-                  {items.length > 0 && (
-                    <div className="mt-2 text-sm text-gray-600 flex items-center gap-1">
-                      <svg
-                        className="h-4 w-4 text-blue-500"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                      Items total must match transaction amount above
-                    </div>
-                  )}
-                </div>
+          <div className="space-y-2">
+            <Label htmlFor="description" className="text-gray-700 dark:text-gray-300">
+              Description *
+            </Label>
+            <Input
+              type="text"
+              id="description"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              required
+              placeholder="Brief description"
+              className="bg-white/50 dark:bg-slate-800/50 border-gray-200 dark:border-gray-700 focus-visible:ring-blue-500 dark:focus-visible:ring-blue-400 text-gray-900 dark:text-gray-100"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="paymentMethod" className="text-gray-700 dark:text-gray-300">
+                Payment Method
+              </Label>
+              <Input
+                type="text"
+                id="paymentMethod"
+                name="paymentMethod"
+                value={formData.paymentMethod}
+                onChange={handleChange}
+                placeholder="e.g., Credit Card, Cash"
+                className="bg-white/50 dark:bg-slate-800/50 border-gray-200 dark:border-gray-700 focus-visible:ring-blue-500 dark:focus-visible:ring-blue-400 text-gray-900 dark:text-gray-100"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="merchant" className="text-gray-700 dark:text-gray-300">
+                Merchant
+              </Label>
+              <Input
+                type="text"
+                id="merchant"
+                name="merchant"
+                value={formData.merchant}
+                onChange={handleChange}
+                placeholder="e.g., Store name"
+                className="bg-white/50 dark:bg-slate-800/50 border-gray-200 dark:border-gray-700 focus-visible:ring-blue-500 dark:focus-visible:ring-blue-400 text-gray-900 dark:text-gray-100"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="notes" className="text-gray-700 dark:text-gray-300">
+              Notes
+            </Label>
+            <textarea
+              id="notes"
+              name="notes"
+              value={formData.notes}
+              onChange={handleChange}
+              rows="3"
+              placeholder="Additional notes (optional)"
+              className="flex min-h-[80px] w-full rounded-md border border-input bg-white/50 dark:bg-slate-800/50 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:focus-visible:ring-blue-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700"
+            />
+          </div>
+
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+            <div className="flex items-center justify-between mb-3">
+              <label className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={showItems}
+                  onChange={(e) => {
+                    setShowItems(e.target.checked);
+                    if (!e.target.checked) {
+                      setItems([]);
+                    }
+                  }}
+                  className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded"
+                />
+                Add detailed items (optional)
+              </label>
+              {items.length > 0 && (
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  {items.length} item{items.length !== 1 ? 's' : ''}
+                </span>
               )}
             </div>
 
-            <div className="flex justify-end gap-3 pt-4">
-              <button
-                type="button"
-                onClick={() => onClose(false)}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? <LoadingSpinner size="sm" /> : transaction ? 'Update' : 'Create'}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+            {showItems && (
+              <div className="bg-gray-50 dark:bg-slate-800/50 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                <ItemsTable
+                  items={items}
+                  categories={categories}
+                  onItemsChange={setItems}
+                  currency={formData.currency}
+                />
+                {items.length > 0 && (
+                  <div className="mt-2 text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                    <svg
+                      className="h-4 w-4 text-blue-500 dark:text-blue-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    Items total must match transaction amount above
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200/50 dark:border-gray-700/50">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onClose(false)}
+              disabled={loading}
+              className="border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={loading}
+              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 dark:from-blue-500 dark:to-blue-600 dark:hover:from-blue-600 dark:hover:to-blue-700 text-white shadow-lg shadow-blue-500/30 dark:shadow-blue-900/40"
+            >
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <LoadingSpinner size="sm" />
+                  Saving...
+                </span>
+              ) : (
+                <span>{transaction ? 'Update' : 'Create'} Transaction</span>
+              )}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
 

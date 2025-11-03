@@ -5,6 +5,13 @@ import categoryService from '../services/categoryService';
 import RuleModal from '../components/import/RuleModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorAlert from '../components/ErrorAlert';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const CategoryRules = () => {
   const [rules, setRules] = useState([]);
@@ -13,7 +20,7 @@ const CategoryRules = () => {
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [selectedRule, setSelectedRule] = useState(null);
-  const [filterCategory, setFilterCategory] = useState('');
+  const [filterCategory, setFilterCategory] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 20;
 
@@ -105,7 +112,7 @@ const CategoryRules = () => {
   };
 
   // Filter rules
-  const filteredRules = filterCategory
+  const filteredRules = filterCategory && filterCategory !== 'all'
     ? rules.filter(r => r.categoryId === filterCategory)
     : rules;
 
@@ -121,7 +128,7 @@ const CategoryRules = () => {
   }, [filterCategory]);
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div>
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Category Rules</h1>
         <p className="text-gray-600 mt-2">
@@ -142,21 +149,25 @@ const CategoryRules = () => {
             <label className="text-sm font-medium text-gray-700">
               Filter by Category:
             </label>
-            <select
+            <Select
               value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
-              className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border text-sm"
+              onValueChange={(value) => setFilterCategory(value)}
             >
-              <option value="">All Categories</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.icon} {category.name}
-                </option>
-              ))}
-            </select>
-            {filterCategory && (
+              <SelectTrigger className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border text-sm w-[200px] bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm">
+                <SelectValue placeholder="All Categories" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.icon} {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {filterCategory && filterCategory !== 'all' && (
               <button
-                onClick={() => setFilterCategory('')}
+                onClick={() => setFilterCategory('all')}
                 className="text-gray-400 hover:text-gray-600"
                 title="Clear filter"
               >
@@ -200,11 +211,11 @@ const CategoryRules = () => {
             No rules found
           </h3>
           <p className="text-gray-600 mb-4">
-            {filterCategory
+            {filterCategory && filterCategory !== 'all'
               ? 'No rules for the selected category'
               : 'Create your first category rule to automatically categorize imported transactions'}
           </p>
-          {!filterCategory && (
+          {(!filterCategory || filterCategory === 'all') && (
             <button
               onClick={handleCreate}
               className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium inline-flex items-center gap-2"

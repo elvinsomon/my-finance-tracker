@@ -5,6 +5,13 @@ import accountService from '../services/accountService';
 import ErrorAlert from '../components/ErrorAlert';
 import LoadingSpinner from '../components/LoadingSpinner';
 import DateRangePicker from '../components/DateRangePicker';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const Export = () => {
   const [loading, setLoading] = useState(false);
@@ -14,9 +21,9 @@ const Export = () => {
   const [filters, setFilters] = useState({
     startDate: '',
     endDate: '',
-    type: '',
-    categoryId: '',
-    accountId: '',
+    type: 'all',
+    categoryId: 'all',
+    accountId: 'all',
   });
 
   useEffect(() => {
@@ -45,7 +52,15 @@ const Export = () => {
     setError(null);
 
     try {
-      await transactionService.exportCSV(filters);
+      // Clean up filters - convert 'all' to empty string for the API
+      const exportFilters = {
+        startDate: filters.startDate,
+        endDate: filters.endDate,
+        type: filters.type === 'all' ? '' : filters.type,
+        categoryId: filters.categoryId === 'all' ? '' : filters.categoryId,
+        accountId: filters.accountId === 'all' ? '' : filters.accountId,
+      };
+      await transactionService.exportCSV(exportFilters);
     } catch (err) {
       setError(err);
     } finally {
@@ -89,55 +104,67 @@ const Export = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Transaction Type
               </label>
-              <select
+              <Select
                 value={filters.type}
-                onChange={(e) => handleFilterChange('type', e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
+                onValueChange={(value) => handleFilterChange('type', value)}
               >
-                <option value="">All Types</option>
-                <option value="Income">Income</option>
-                <option value="Expense">Expense</option>
-                <option value="Transfer">Transfer</option>
-              </select>
+                <SelectTrigger className="w-full bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
+                  <SelectValue placeholder="All Types" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="Income">Income</SelectItem>
+                  <SelectItem value="Expense">Expense</SelectItem>
+                  <SelectItem value="Transfer">Transfer</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Category
               </label>
-              <select
+              <Select
                 value={filters.categoryId}
-                onChange={(e) => handleFilterChange('categoryId', e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
+                onValueChange={(value) => handleFilterChange('categoryId', value)}
               >
-                <option value="">All Categories</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.icon} {category.name}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="w-full bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
+                  <SelectValue placeholder="All Categories" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.icon} {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Account
               </label>
-              <select
+              <Select
                 value={filters.accountId}
-                onChange={(e) => handleFilterChange('accountId', e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
+                onValueChange={(value) => handleFilterChange('accountId', value)}
               >
-                <option value="">All Accounts</option>
-                {accounts.map((account) => (
-                  <option key={account.id} value={account.id}>
-                    {account.name}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="w-full bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
+                  <SelectValue placeholder="All Accounts" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Accounts</SelectItem>
+                  {accounts.map((account) => (
+                    <SelectItem key={account.id} value={account.id}>
+                      {account.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>

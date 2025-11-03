@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react';
 import transactionService from '../services/transactionService';
 import categoryService from '../services/categoryService';
 import accountService from '../services/accountService';
-import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorAlert from '../components/ErrorAlert';
-import TransactionCard from '../components/TransactionCard';
-import DateRangePicker from '../components/DateRangePicker';
 import TransactionModal from '../components/TransactionModal';
+import TransactionsTable from '../components/transactions/TransactionsTable';
+import FiltersPanel from '../components/transactions/FiltersPanel';
+import { Plus } from 'lucide-react';
 
 const Transactions = () => {
   const [loading, setLoading] = useState(true);
@@ -14,12 +14,6 @@ const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
   const [accounts, setAccounts] = useState([]);
-  const [pagination, setPagination] = useState({
-    page: 1,
-    pageSize: 20,
-    totalCount: 0,
-    totalPages: 0,
-  });
   const [filters, setFilters] = useState({
     startDate: '',
     endDate: '',
@@ -32,7 +26,7 @@ const Transactions = () => {
 
   useEffect(() => {
     fetchData();
-  }, [pagination.page, filters]);
+  }, [filters]);
 
   useEffect(() => {
     fetchCategoriesAndAccounts();
@@ -43,18 +37,22 @@ const Transactions = () => {
       setLoading(true);
       setError(null);
 
+      // Build query params, excluding pagination for client-side table
+      const params = {};
+      if (filters.startDate) params.startDate = filters.startDate;
+      if (filters.endDate) params.endDate = filters.endDate;
+      if (filters.type) params.type = filters.type;
+      if (filters.categoryId) params.categoryId = filters.categoryId;
+      if (filters.accountId) params.accountId = filters.accountId;
+
+      // Fetch all matching transactions (or use large page size)
       const response = await transactionService.getAll({
-        page: pagination.page,
-        pageSize: pagination.pageSize,
-        ...filters,
+        page: 1,
+        pageSize: 1000, // Get all transactions for client-side pagination
+        ...params,
       });
 
       setTransactions(response.data);
-      setPagination({
-        ...pagination,
-        totalCount: response.totalCount,
-        totalPages: response.totalPages,
-      });
     } catch (err) {
       setError(err);
     } finally {
@@ -77,7 +75,6 @@ const Transactions = () => {
 
   const handleFilterChange = (field, value) => {
     setFilters({ ...filters, [field]: value });
-    setPagination({ ...pagination, page: 1 });
   };
 
   const handleClearFilters = () => {
@@ -88,7 +85,6 @@ const Transactions = () => {
       categoryId: '',
       accountId: '',
     });
-    setPagination({ ...pagination, page: 1 });
   };
 
   const handleNewTransaction = () => {
@@ -114,6 +110,18 @@ const Transactions = () => {
     }
   };
 
+  const handleBulkDelete = async (transactionIds) => {
+    try {
+      // Delete transactions one by one (or implement bulk delete endpoint)
+      await Promise.all(
+        transactionIds.map((id) => transactionService.delete(id))
+      );
+      fetchData();
+    } catch (err) {
+      setError(err);
+    }
+  };
+
   const handleModalClose = (shouldRefresh) => {
     setIsModalOpen(false);
     setSelectedTransaction(null);
@@ -122,153 +130,60 @@ const Transactions = () => {
     }
   };
 
-  const handlePageChange = (newPage) => {
-    setPagination({ ...pagination, page: newPage });
-  };
-
   return (
     <div>
-      <div className="mb-6 flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Transactions</h1>
-        <button
-          onClick={handleNewTransaction}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium"
-        >
-          New Transaction
-        </button>
+      {/* Header */}
+      <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Transactions
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">
+            Manage and track all your financial transactions
+          </p>
+        </div>
+          <button
+            onClick={handleNewTransaction}
+            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium rounded-lg px-4 py-2.5 flex items-center gap-2 transition-all duration-200"
+          >
+            <Plus className="h-5 w-5" />
+            New Transaction
+          </button>
       </div>
 
+      {/* Error Alert */}
       <ErrorAlert
         message={error?.message}
         errors={error?.errors}
         onClose={() => setError(null)}
       />
 
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 className="text-lg font-semibold mb-4">Filters</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          <div className="lg:col-span-2">
-            <DateRangePicker
-              startDate={filters.startDate}
-              endDate={filters.endDate}
-              onStartDateChange={(value) => handleFilterChange('startDate', value)}
-              onEndDateChange={(value) => handleFilterChange('endDate', value)}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Type
-            </label>
-            <select
-              value={filters.type}
-              onChange={(e) => handleFilterChange('type', e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
-            >
-              <option value="">All Types</option>
-              <option value="Income">Income</option>
-              <option value="Expense">Expense</option>
-              <option value="Transfer">Transfer</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Category
-            </label>
-            <select
-              value={filters.categoryId}
-              onChange={(e) => handleFilterChange('categoryId', e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
-            >
-              <option value="">All Categories</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Account
-            </label>
-            <select
-              value={filters.accountId}
-              onChange={(e) => handleFilterChange('accountId', e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
-            >
-              <option value="">All Accounts</option>
-              {accounts.map((account) => (
-                <option key={account.id} value={account.id}>
-                  {account.name}
-                </option>
-              ))}
-            </select>
-          </div>
+      {/* Layout Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Filters Panel - Left Sidebar on Desktop */}
+        <div className="lg:col-span-1">
+          <FiltersPanel
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            onClearFilters={handleClearFilters}
+            categories={categories}
+            accounts={accounts}
+          />
         </div>
-        <div className="mt-4">
-          <button
-            onClick={handleClearFilters}
-            className="text-sm text-gray-600 hover:text-gray-900"
-          >
-            Clear filters
-          </button>
+
+        {/* Transactions Table - Main Content */}
+        <div className="lg:col-span-3">
+          <TransactionsTable
+            data={transactions}
+            loading={loading}
+            onEdit={handleEditTransaction}
+            onDelete={handleDeleteTransaction}
+            onBulkDelete={handleBulkDelete}
+          />
         </div>
       </div>
 
-      {loading ? (
-        <div className="flex justify-center py-12">
-          <LoadingSpinner size="lg" />
-        </div>
-      ) : transactions.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-12 text-center">
-          <p className="text-gray-500 mb-4">No transactions found</p>
-          <button
-            onClick={handleNewTransaction}
-            className="text-blue-600 hover:text-blue-800 font-medium"
-          >
-            Add your first transaction
-          </button>
-        </div>
-      ) : (
-        <>
-          <div className="space-y-4 mb-6">
-            {transactions.map((transaction) => (
-              <TransactionCard
-                key={transaction.id}
-                transaction={transaction}
-                onEdit={handleEditTransaction}
-                onDelete={handleDeleteTransaction}
-              />
-            ))}
-          </div>
-
-          <div className="flex justify-between items-center bg-white rounded-lg shadow p-4">
-            <div className="text-sm text-gray-600">
-              Showing {transactions.length} of {pagination.totalCount} transactions
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => handlePageChange(pagination.page - 1)}
-                disabled={pagination.page === 1}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Previous
-              </button>
-              <span className="px-4 py-2 text-sm text-gray-700">
-                Page {pagination.page} of {pagination.totalPages}
-              </span>
-              <button
-                onClick={() => handlePageChange(pagination.page + 1)}
-                disabled={pagination.page === pagination.totalPages}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        </>
-      )}
-
+      {/* Transaction Modal */}
       {isModalOpen && (
         <TransactionModal
           transaction={selectedTransaction}

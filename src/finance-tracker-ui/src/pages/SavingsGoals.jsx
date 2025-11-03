@@ -6,6 +6,13 @@ import GoalProgressCard from '../components/GoalProgressCard';
 import GoalModal from '../components/GoalModal';
 import { formatCurrency } from '../utils/formatters';
 import { useAuth } from '../hooks/useAuth';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const SavingsGoals = () => {
   const [loading, setLoading] = useState(true);
@@ -261,16 +268,20 @@ const SavingsGoals = () => {
 
           <div className="flex items-center gap-2">
             <label className="text-sm font-medium text-gray-700">Sort by:</label>
-            <select
+            <Select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border text-sm"
+              onValueChange={(value) => setSortBy(value)}
             >
-              <option value="priority">Priority</option>
-              <option value="progress">Progress</option>
-              <option value="date">Target Date</option>
-              <option value="amount">Target Amount</option>
-            </select>
+              <SelectTrigger className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border text-sm w-[180px] bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="priority">Priority</SelectItem>
+                <SelectItem value="progress">Progress</SelectItem>
+                <SelectItem value="date">Target Date</SelectItem>
+                <SelectItem value="amount">Target Amount</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>
