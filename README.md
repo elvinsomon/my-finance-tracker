@@ -33,6 +33,27 @@ Access the application:
 └─────────────┘     └─────────────┘     └──────────────┘     └─────────┘
 ```
 
+### Project Structure
+
+```
+MyFinanceTracker/
+├── src/
+│   ├── FinanceTrackerAPI/          # Backend .NET Web API
+│   │   ├── FinanceManager.sln
+│   │   ├── FinanceManager.API/     # Presentation Layer
+│   │   ├── FinanceManager.Core/    # Domain Layer
+│   │   └── FinanceManager.Infrastructure/  # Infrastructure Layer
+│   └── finance-tracker-ui/         # Frontend React Application
+├── docs/
+│   ├── backend/                    # Backend-specific documentation
+│   ├── frontend/                   # Frontend-specific documentation
+│   ├── infrastructure/             # Infrastructure documentation
+│   └── [general docs]              # Project-wide documentation
+├── docker-compose.yml              # Docker orchestration
+├── CLAUDE.md                       # Development guide for Claude Code
+└── README.md                       # This file
+```
+
 ### Technology Stack
 
 **Backend**:
@@ -56,11 +77,39 @@ Access the application:
 
 ## 📖 Documentation
 
+### Root Level
 - **[CLAUDE.md](./CLAUDE.md)**: Development guide for Claude Code
-- **[Docker Deployment](./docs/infrastructure/docker-deployment.md)**: Complete Docker setup guide
+- **[README.md](./README.md)**: This file - Quick start and overview
+
+### General Documentation (`/docs/`)
+- **[MVP Plan](./docs/mvp-plan.md)**: Complete project roadmap and phases
+- **[Project Status](./docs/PROJECT-STATUS.md)**: Current implementation status
+- **[API Contracts](./docs/api-contracts.md)**: Complete API endpoint documentation
+- **[Functional Requirements](./docs/functional-requirements.md)**: Feature specifications
+- **[CSV Import Specification](./docs/feature4-csv-import-specification.md)**: Detailed import feature spec
+- **[Phase 2 Plan](./docs/phase2-plan.md)**: Expansion phase details
+- **[Changelog](./docs/CHANGELOG.md)**: Version history
+
+### Backend Documentation (`/docs/backend/`)
 - **[Backend Architecture](./docs/backend/backend-architecture.md)**: API architecture details
-- **[API Contracts](./docs/api-contracts.md)**: API endpoints documentation
-- **[MVP Plan](./docs/mvp-plan.md)**: Project roadmap
+- **[Layered Architecture](./docs/backend/layered-architecture.md)**: 3-layer pattern explanation
+- **[EF Core Code-First](./docs/backend/efcore-code-first.md)**: Database approach guidelines
+- **[Implementation Log](./docs/backend/implementation-log.md)**: Backend development history
+
+### Frontend Documentation (`/docs/frontend/`)
+- **[API Integration](./docs/frontend/api-integration.md)**: Frontend API client setup
+- **[Component Library](./docs/frontend/component-library.md)**: UI components guide
+- **[Routing](./docs/frontend/routing.md)**: React Router configuration
+- **[UI Decisions](./docs/frontend/ui-decisions.md)**: Design system choices
+- **[Implementation Log](./docs/frontend/implementation-log.md)**: Frontend development history
+- **Implementation Guides**: Detailed guides for Sidebar, TopBar, StatCard, Charts, etc.
+
+### Infrastructure Documentation (`/docs/infrastructure/`)
+- **[Database Schema](./docs/infrastructure/database-squema.md)**: Complete database design
+- **[Docker Services](./docs/infrastructure/docker-services.md)**: Container configuration
+- **[Docker Deployment](./docs/infrastructure/docker-deployment.md)**: Deployment guide
+- **[Setup Guide](./docs/infrastructure/setup.md)**: Infrastructure setup instructions
+- **[Implementation Log](./docs/infrastructure/implementation-log.md)**: Infrastructure history
 
 ## 🛠️ Development
 
@@ -68,7 +117,7 @@ Access the application:
 
 #### Backend
 ```bash
-cd backend
+cd src/FinanceTrackerAPI
 dotnet run --project FinanceManager.API
 # API runs at http://localhost:5000
 ```
@@ -87,7 +136,7 @@ npm run dev
 docker-compose up -d postgres
 
 # Apply migrations
-cd backend
+cd src/FinanceTrackerAPI
 TMPDIR=/tmp dotnet ef database update --project FinanceManager.Infrastructure --startup-project FinanceManager.API
 ```
 

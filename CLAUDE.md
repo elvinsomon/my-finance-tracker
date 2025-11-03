@@ -28,11 +28,32 @@ MyFinanceTracker is a personal finance management application with multi-currenc
 - Docker (containerization)
 - Ollama (future ML/AI integration)
 
+## Project Structure
+
+```
+MyFinanceTracker/
+├── src/
+│   ├── FinanceTrackerAPI/          # Backend .NET Web API
+│   │   ├── FinanceManager.sln
+│   │   ├── FinanceManager.API/     # Presentation Layer
+│   │   ├── FinanceManager.Core/    # Domain Layer
+│   │   └── FinanceManager.Infrastructure/  # Infrastructure Layer
+│   └── finance-tracker-ui/         # Frontend React Application
+├── docs/
+│   ├── backend/                    # Backend-specific documentation
+│   ├── frontend/                   # Frontend-specific documentation
+│   ├── infrastructure/             # Infrastructure documentation
+│   └── [general docs]              # Project-wide documentation
+├── docker-compose.yml
+├── CLAUDE.md                       # This file
+└── README.md
+```
+
 ## Common Development Commands
 
 ### Backend (.NET)
 
-All backend commands should be run from the `backend/` directory:
+All backend commands should be run from the `src/FinanceTrackerAPI/` directory:
 
 ```bash
 # Check .NET version
@@ -58,6 +79,28 @@ TMPDIR=/tmp dotnet ef database update --project FinanceManager.Infrastructure --
 TMPDIR=/tmp dotnet ef database update <PreviousMigrationName> --project FinanceManager.Infrastructure --startup-project FinanceManager.API
 ```
 
+### Frontend (React)
+
+All frontend commands should be run from the `src/finance-tracker-ui/` directory:
+
+```bash
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+# UI runs at http://localhost:5173
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+
+# Run linter
+npm run lint
+```
+
 **Note**: Use `TMPDIR=/tmp` prefix on macOS to avoid /var/folders permission issues with .NET tooling.
 
 ### Docker
@@ -80,7 +123,7 @@ docker exec -it <container-id> <command>
 The backend follows a **strict layered architecture** with clear separation of concerns:
 
 ```
-backend/
+src/FinanceTrackerAPI/
 ├── FinanceManager.sln
 ├── FinanceManager.API/          # Presentation Layer
 ├── FinanceManager.Core/         # Domain Layer
@@ -218,19 +261,49 @@ See `docs/infrastructure/database-squema.md` for complete schema diagram.
 - Usage: `request.Adapt<Transaction>()`
 - Custom configurations in `API/Mappings/`
 
+## Documentation Organization
+
+The project documentation is organized as follows:
+
+- **Root level** (`/CLAUDE.md`, `/README.md`): General project information and quick start
+- **`/docs/`**: Main documentation directory
+  - **General docs** (root of `/docs/`): Project-wide documentation
+    - `mvp-plan.md`: Complete project roadmap and phases
+    - `PROJECT-STATUS.md`: Current implementation status
+    - `feature4-csv-import-specification.md`: Detailed CSV import feature spec
+    - `api-contracts.md`: Complete API endpoint documentation
+    - `functional-requirements.md` & `non-functional-requirements.md`: Requirements
+  - **`/docs/backend/`**: Backend-specific documentation
+    - `backend-architecture.md`: API architecture details
+    - `layered-architecture.md`: 3-layer architecture explanation
+    - `efcore-code-first.md`: Entity Framework guidelines
+    - `implementation-log.md`: Backend development log
+  - **`/docs/frontend/`**: Frontend-specific documentation
+    - UI component guides and implementation details
+    - `api-integration.md`: Frontend API integration
+    - `implementation-log.md`: Frontend development log
+  - **`/docs/infrastructure/`**: Infrastructure documentation
+    - `database-squema.md`: Complete database schema
+    - `docker-services.md`: Docker services configuration
+    - `setup.md`: Infrastructure setup guide
+  - **`/docs/statements-samples/`**: Sample bank statement files for testing imports
+
 ## Development Workflow
 
 1. **Read documentation** in `docs/` to understand requirements
-2. **Define entities** in `FinanceManager.Core/Entities/`
-3. **Configure entities** in `Infrastructure/Data/Configurations/`
+   - Check `docs/backend/` for backend-specific docs
+   - Check `docs/frontend/` for frontend-specific docs
+   - Check `docs/infrastructure/` for database and deployment docs
+2. **Define entities** in `src/FinanceTrackerAPI/FinanceManager.Core/Entities/`
+3. **Configure entities** in `src/FinanceTrackerAPI/FinanceManager.Infrastructure/Data/Configurations/`
 4. **Generate migration** and update database
-5. **Create repository interface** in `Core/Interfaces/Repositories/`
-6. **Implement repository** in `Infrastructure/Repositories/`
-7. **Create service interface** in `Core/Interfaces/Services/`
-8. **Implement service** in `API/Services/` or separate service layer
-9. **Create DTOs** in `API/DTOs/`
-10. **Create controller** in `API/Controllers/`
-11. **Test endpoints** via Swagger UI or API client
+5. **Create repository interface** in `src/FinanceTrackerAPI/FinanceManager.Core/Interfaces/Repositories/`
+6. **Implement repository** in `src/FinanceTrackerAPI/FinanceManager.Infrastructure/Repositories/`
+7. **Create service interface** in `src/FinanceTrackerAPI/FinanceManager.Core/Interfaces/Services/`
+8. **Implement service** in `src/FinanceTrackerAPI/FinanceManager.API/Services/` or separate service layer
+9. **Create DTOs** in `src/FinanceTrackerAPI/FinanceManager.API/DTOs/`
+10. **Create controller** in `src/FinanceTrackerAPI/FinanceManager.API/Controllers/`
+11. **Test endpoints** via Swagger UI at `http://localhost:5000/swagger` or API client
 
 ## Important Notes
 

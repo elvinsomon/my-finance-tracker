@@ -155,37 +155,54 @@ Bienvenido a la documentación técnica de MyFinanceTracker. Este directorio con
 ## 🗂️ Estructura de Documentación
 
 ```
-docs/
-├── README.md                           # Este archivo
-├── PROJECT-STATUS.md                   # ⭐ Estado actual del proyecto
-├── phase2-plan.md                      # ⭐ Plan de Fase 2 (documento de trabajo)
-├── feature4-csv-import-specification.md # ⭐ Spec de CSV Import
+MyFinanceTracker/
+├── CLAUDE.md                           # Guía de desarrollo para Claude Code
+├── README.md                           # Quick start y overview general
+├── docker-compose.yml                  # Orquestación de contenedores
 │
-├── mvp-plan.md                         # Plan MVP original
-├── functional-requirements.md          # Requisitos funcionales
-├── non-functional-requirements.md      # Requisitos no funcionales
-├── api-contracts.md                    # Contratos API
-├── stack.md                            # Stack tecnológico
+├── src/                                # Código fuente
+│   ├── FinanceTrackerAPI/              # Backend .NET Web API
+│   │   ├── FinanceManager.sln
+│   │   ├── FinanceManager.API/         # Presentation Layer
+│   │   ├── FinanceManager.Core/        # Domain Layer
+│   │   └── FinanceManager.Infrastructure/ # Infrastructure Layer
+│   └── finance-tracker-ui/             # Frontend React Application
 │
-├── backend/                            # Documentos de backend
-│   ├── backend-architecture.md
-│   ├── layered-architecture.md
-│   ├── efcore-code-first.md
-│   └── implementation-log.md
-│
-├── frontend/                           # Documentos de frontend
-│   ├── component-library.md
-│   ├── routing.md
-│   ├── ui-decisions.md
-│   ├── api-integration.md
-│   └── implementation-log.md
-│
-└── infrastructure/                     # Documentos de infraestructura
-    ├── database-squema.md
-    ├── docker-deployment.md
-    ├── docker-services.md
-    ├── setup.md
-    └── implementation-log.md
+└── docs/                               # Documentación
+    ├── README.md                       # Este archivo (índice de docs)
+    ├── PROJECT-STATUS.md               # ⭐ Estado actual del proyecto
+    ├── phase2-plan.md                  # ⭐ Plan de Fase 2
+    ├── feature4-csv-import-specification.md # ⭐ Spec de CSV Import
+    │
+    ├── mvp-plan.md                     # Plan MVP original
+    ├── functional-requirements.md      # Requisitos funcionales
+    ├── non-functional-requirements.md  # Requisitos no funcionales
+    ├── api-contracts.md                # Contratos API completos
+    ├── stack.md                        # Stack tecnológico
+    ├── CHANGELOG.md                    # Historial de cambios
+    │
+    ├── backend/                        # Documentación backend
+    │   ├── backend-architecture.md     # Arquitectura API
+    │   ├── layered-architecture.md     # 3-layer pattern
+    │   ├── efcore-code-first.md        # EF Core guidelines
+    │   └── implementation-log.md       # Log de desarrollo
+    │
+    ├── frontend/                       # Documentación frontend
+    │   ├── component-library.md        # Componentes UI
+    │   ├── routing.md                  # React Router
+    │   ├── ui-decisions.md             # Decisiones de diseño
+    │   ├── api-integration.md          # Cliente API
+    │   ├── implementation-log.md       # Log de desarrollo
+    │   └── [guías de implementación]   # Sidebar, TopBar, Charts, etc.
+    │
+    ├── infrastructure/                 # Documentación infraestructura
+    │   ├── database-squema.md          # Schema completo
+    │   ├── docker-deployment.md        # Guía de deployment
+    │   ├── docker-services.md          # Configuración Docker
+    │   ├── setup.md                    # Setup inicial
+    │   └── implementation-log.md       # Log de configuración
+    │
+    └── statements-samples/             # Archivos CSV de ejemplo para testing
 ```
 
 ---
